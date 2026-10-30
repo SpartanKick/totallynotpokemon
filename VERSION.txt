@@ -1,0 +1,2 @@
+Version 28
+Check: sw.js line 3 must say wildmoor-v28
