@@ -715,10 +715,33 @@ const hostOf = u => { try { return new URL(u).host; } catch { return ""; } };
 
 /* ---------- Card prices ---------- */
 const TCGDEX_URL = "https://api.tcgdex.net/v2/en/cards/{id}", PTCG_URL = "https://api.pokemontcg.io/v2/cards?q=set.id:{set}&pageSize=250&select=id,tcgplayer,cardmarket";
-const CUR = {USD:"$", EUR:"\u20ac", GBP:"\u00a3", AUD:"A$", CAD:"C$", JPY:"\u00a5"};
-const money = (v, cur) => (CUR[cur] || (cur ? cur + " " : "$")) + (v >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(2));
+const CUR = {USD:"$", EUR:"\u20ac", GBP:"\u00a3", AUD:"A$", CAD:"C$", NZD:"NZ$", JPY:"\u00a5", ZAR:"R", CHF:"CHF ", SEK:"kr ", NOK:"kr ", DKK:"kr ", PLN:"z\u0142 ", CZK:"K\u010d ", HUF:"Ft ", RON:"lei ", BGN:"lv ", TRY:"\u20ba", BRL:"R$", MXN:"MX$", INR:"\u20b9", CNY:"CN\u00a5", HKD:"HK$", SGD:"S$", KRW:"\u20a9", IDR:"Rp ", MYR:"RM ", PHP:"\u20b1", THB:"\u0e3f", ILS:"\u20aa", ISK:"kr "};
+const CURNAMES = {USD:"US dollar", EUR:"Euro", GBP:"British pound", ZAR:"South African rand", AUD:"Australian dollar", CAD:"Canadian dollar", NZD:"New Zealand dollar", JPY:"Japanese yen", CHF:"Swiss franc", SEK:"Swedish krona", NOK:"Norwegian krone", DKK:"Danish krone", PLN:"Polish zloty", CZK:"Czech koruna", HUF:"Hungarian forint", RON:"Romanian leu", BGN:"Bulgarian lev", TRY:"Turkish lira", BRL:"Brazilian real", MXN:"Mexican peso", INR:"Indian rupee", CNY:"Chinese yuan", HKD:"Hong Kong dollar", SGD:"Singapore dollar", KRW:"South Korean won", IDR:"Indonesian rupiah", MYR:"Malaysian ringgit", PHP:"Philippine peso", THB:"Thai baht", ILS:"Israeli shekel", ISK:"Icelandic krona"};
+const ZERO_DEC = new Set(["JPY", "KRW", "IDR", "HUF", "ISK"]);
+/* units of a currency per 1 US dollar: a rate you set by hand wins over the downloaded one */
+const rateOf = c => c === "USD" ? 1 : ((state.manualRates && state.manualRates[c]) || (state.rates && state.rates.r && state.rates.r[c]) || 0);
+const convertAmt = (v, from, to) => { const a = rateOf(from), b = rateOf(to); return a && b ? v / a * b : null; };
+const toUSD = (v, cur) => (!cur || cur === "USD") ? v : convertAmt(v, cur, "USD");
+function fmtMoney(v, cur){
+  const sym = CUR[cur] || (cur ? cur + " " : "$"), z = ZERO_DEC.has(cur);
+  return sym + (v >= 1000 || z ? Math.round(v).toLocaleString() : v.toFixed(2));
+}
+/* shows an amount in the currency you picked, when a rate is available */
+const money = (v, cur) => {
+  const from = cur || "USD", to = state.curShow;
+  if (to && to !== from){ const x = convertAmt(v, from, to); if (x != null) return fmtMoney(x, to); }
+  return fmtMoney(v, from);
+};
 const ptag = c => (state.showPrices !== false && c && c.price != null) ? `<span class="ptag">${esc(money(c.price, c.cur))}</span>` : "";
-function sumItems(items){ const m = {}; for (const x of items){ if (x.card.price == null) continue; const k = x.card.cur || "USD"; m[k] = (m[k] || 0) + x.card.price * (x.q || 1); } return m; }
+function sumItems(items){
+  const m = {}, to = state.curShow;
+  for (const x of items){
+    if (x.card.price == null) continue; let v = x.card.price * (x.q || 1), c = x.card.cur || "USD";
+    if (to && to !== c){ const y = convertAmt(v, c, to); if (y != null){ v = y; c = to; } }
+    m[c] = (m[c] || 0) + v;
+  }
+  return m;
+}
 const sumCards = cards => sumItems(cards.map(card => ({card, q:1})));
 const fmtTotals = m => { const parts = Object.keys(m).filter(k => m[k] > 0).map(k => money(m[k], k)); return parts.length ? parts.join(" + ") : null; };
 function pickMarket(o){
@@ -737,8 +760,9 @@ function priceFromRaw(c, rarity){
     if (!keys.length){ const flat = pickMarket(tp); if (flat != null) return {price:flat, cur:tp.unit || "USD"}; }
     const score = k => { const l = k.toLowerCase(), rev = /reverse/.test(l), hol = /holo/.test(l) && !rev, first = /1st|first/.test(l);
       return (holo ? (hol ? 0 : rev ? 2 : 1) : (!hol && !rev ? 0 : rev ? 1 : 2)) * 2 + (first ? 1 : 0); };
+    const vars = {}; for (const k of keys){ const v = pickMarket(tp[k]); if (v != null) vars[k] = Math.round(v * 100) / 100; }
     keys.sort((x, y) => score(x) - score(y));
-    for (const k of keys){ const v = pickMarket(tp[k]); if (v != null) return {price:v, cur:tp.unit || "USD"}; }
+    for (const k of keys){ const v = pickMarket(tp[k]); if (v != null) return {price:v, cur:tp.unit || "USD", vars}; }
   }
   const cm = (c.cardmarket && c.cardmarket.prices) || (c.pricing && c.pricing.cardmarket) || (c.prices && c.prices.cardmarket);
   if (cm && typeof cm === "object"){
@@ -748,6 +772,30 @@ function priceFromRaw(c, rarity){
   return null;
 }
 function setKey(set){ if (set.key) return set.key; const id = set.cards[0] && set.cards[0].id; const m = id && String(id).match(/^(.*)-[^-]+$/); return m ? m[1] : ""; }
+const prettyVariant = k => String(k).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]+/g, " ").replace(/\b\w/g, m => m.toUpperCase());
+function setPrice(c, pr){
+  c.price = Math.round(pr.price * 100) / 100; c.cur = pr.cur; const ks = pr.vars ? Object.keys(pr.vars) : [];
+  if (ks.length > 1){ c.pv = pr.vars; c.pa = c.price; } else { delete c.pv; delete c.pa; }
+}
+function pickVariant(c){
+  const pv = c.pv, ks = pv ? Object.keys(pv) : []; if (ks.length < 2 || c.manual) return null;
+  const mode = state.priceVariant || "auto";
+  if (mode === "high") return Math.max(...ks.map(k => pv[k]));
+  if (mode === "first"){ const f = ks.filter(k => /1st|first/i.test(k)); if (f.length) return Math.max(...f.map(k => pv[k])); }
+  return null;
+}
+function applyVariant(only){
+  for (const set of (only ? [only] : sets)) for (const c of set.cards){ if (!c.pv || c.manual) continue; const v = pickVariant(c); c.price = v != null ? v : (c.pa != null ? c.pa : c.price); }
+}
+async function fetchRates(){
+  const tries = [["https://api.frankfurter.dev/v1/latest?base=USD"], ["https://allratestoday.com/api/open/latest/USD"]];
+  for (const [url] of tries){
+    try { const r = await fetch(url); if (!r.ok) continue; const j = await r.json(), rates = j && j.rates;
+      if (rates && typeof rates.EUR === "number") return {base:"USD", t:Date.now(), date:String(j.date || "").slice(0, 10), r:{...rates, USD:1}, src:hostOf(url)}; } catch {}
+  }
+  throw new Error("rates");
+}
+async function refreshRates(){ state.rates = await fetchRates(); persist(); return state.rates; }
 async function fetchSetPrices(set, tpl, headers){
   const key = setKey(set); if (!key) throw new Error(`I couldn\u2019t work out the set code for ${set.name}.`);
   const byId = new Map(), sizeParam = parseInt((tpl.match(/pageSize=(\d+)/) || [])[1], 10) || 0;
@@ -762,8 +810,8 @@ async function fetchSetPrices(set, tpl, headers){
     const total = j.totalCount ?? j.total_count ?? j.total; if (typeof total === "number" && byId.size >= total) break;
   }
   let n = 0;
-  for (const c of set.cards){ const raw = byId.get(slug(c.id)); if (!raw) continue; const pr = priceFromRaw(raw, c.rarity || "common"); if (pr){ c.price = Math.round(pr.price * 100) / 100; c.cur = pr.cur; n++; } }
-  set.pricedAt = Date.now(); return n;
+  for (const c of set.cards){ const raw = byId.get(slug(c.id)); if (!raw) continue; const pr = priceFromRaw(raw, c.rarity || "common"); if (pr){ setPrice(c, pr); n++; } }
+  set.pricedAt = Date.now(); applyVariant(set); return n;
 }
 const pricedTry = new Set();
 function refreshPriced(){
@@ -796,7 +844,7 @@ const nrm = x => String(x || "").toLowerCase().replace(/&/g, "and").replace(/\b(
 const similar = (a, b) => { const x = nrm(a), y = nrm(b); return !!x && !!y && (x === y || x.includes(y) || y.includes(x)); };
 const tcgdex = {sets:null, maps:new Map()};
 async function resolveTcgdexIds(set, base, headers){
-  if (!tcgdex.sets){ const r = await fetch(base + "/sets", {headers}); if (!r.ok) throw new Error(`The price source answered with error ${r.status}.`); tcgdex.sets = await r.json(); }
+  if (!tcgdex.sets){ const r = await fetch(base + "/sets", {headers}); if (!r.ok) throw new Error(`The price source answered with error ${r.status}.`); const list = await r.json(); tcgdex.sets = Array.isArray(list) ? list : []; }
   const nk = nrm(setKey(set)), nn = nrm(set.name); let best = null, bs = 0;
   for (const t of tcgdex.sets){
     const tn = nrm(t.name), ti = nrm(t.id); let sc = 0;
@@ -831,7 +879,7 @@ async function priceOneCard(c, tpl, headers, tid){
     if (r.status === 404) continue;
     if (!r.ok) throw new Error(`The price source answered with error ${r.status}.`);
     const pr = priceFromRaw(await r.json(), c.rarity || "common");
-    if (pr){ c.price = Math.round(pr.price * 100) / 100; c.cur = pr.cur; return true; }
+    if (pr){ setPrice(c, pr); return true; }
     return false;
   }
   return false;
@@ -840,7 +888,7 @@ async function priceCards(set, cards, tpl, headers, progress){
   let i = 0, n = 0; const res = await tcgdexMapFor(set, tpl, headers), idMap = res && res.map;
   const worker = async () => { while (i < cards.length){ const c = cards[i++]; if (await priceOneCard(c, tpl, headers, idMap && idMap.get(c.id))) n++; progress(i, cards.length); } };
   await Promise.all([worker(), worker(), worker(), worker()]);
-  set.pricedAt = Date.now(); return n;
+  set.pricedAt = Date.now(); applyVariant(set); return n;
 }
 async function updatePrices(all){
   const ps = $("#pstatus"), say = (m, er) => { ps.textContent = m; ps.classList.toggle("err", !!er); };
@@ -963,7 +1011,7 @@ function attachTilt(el){
 }
 
 /* ================= Storage ================= */
-const DEFAULT_STATE = () => ({owned:{}, packs:0, active:"wildmoor", back:null, faceDown:false, noFoil:false, imgQuality:"sharp", history:[], showPrices:true, priceUrl:"", autoPrice:true, lite:null, phys:{}, ach:{}, stats:{pulled:0}, days:[], packMode:"set", trades:0, traded:0, tradeLog:[]});
+const DEFAULT_STATE = () => ({owned:{}, packs:0, active:"wildmoor", back:null, faceDown:false, noFoil:false, imgQuality:"sharp", history:[], showPrices:true, priceUrl:"", autoPrice:true, lite:null, priceVariant:"auto", curShow:"", rates:null, manualRates:{}, phys:{}, ach:{}, stats:{pulled:0}, days:[], packMode:"set", trades:0, traded:0, tradeLog:[]});
 function localStore(){
   const get = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } };
   const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
@@ -1424,13 +1472,17 @@ function valHTML(card, set){
   if (card.price != null) return `<p class="vval"><b>${esc(money(card.price, card.cur))}</b> ${card.manual ? "set by you" : "market value"}${!card.manual && set.pricedAt ? `, updated ${esc(new Date(set.pricedAt).toLocaleDateString(undefined, {month:"short", day:"numeric"}))}` : ""}</p>`;
   return set.builtIn ? "" : `<p class="vval dim">No price yet. Update prices in the Library, or tap Set price.</p>`;
 }
+function versionsHTML(card){
+  const ks = card.pv ? Object.keys(card.pv) : []; if (ks.length < 2 || card.manual) return "";
+  return `<p class="vval dim">Versions: ${ks.sort((a, b) => card.pv[b] - card.pv[a]).map(k => `${esc(prettyVariant(k))} ${esc(money(card.pv[k], card.cur))}`).join(", ")}</p>`;
+}
 function zoom(set, card){
   const m = document.createElement("div"); m.className = "modal viewer3d"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", card.name + ", 3D view");
   const q = state.owned[ownKey(set, card)] || 0, hand0 = (state.phys && state.phys[ownKey(set, card)]) || 0, big = !set.builtIn && card.image && thumbOf(card) && state.imgQuality !== "fast" ? false : true;
   m.innerHTML = `<div class="stage3d" id="stage3d"><div class="rot" id="rot">
       <div class="side front">${cardHTML(set, card, "100%", big, true)}<div class="sheen3d"></div></div>
       <div class="side back">${backInner(set)}</div></div></div>
-    ${valHTML(card, set)}
+    ${valHTML(card, set)}${versionsHTML(card)}
     <p class="vhint" id="vhint">${q} owned${hand0 ? `, ${hand0} in hand` : ""}. Drag to rotate, pinch or scroll to zoom, double-tap to reset.</p>
     <div class="row vrow"><button class="btn ghost small" id="vflip">Flip over</button><button class="btn ghost small" id="vreset">Reset</button>${set.builtIn ? "" : `<button class="btn ghost small" id="vprice">${card.price != null ? "Edit price" : "Set price"}</button>`}${set.builtIn ? "" : `<button class="btn ghost small" id="vhand">I own this card</button>`}<button class="btn ghost small" id="zclose">Close</button></div>`;
   document.body.appendChild(m);
@@ -1485,10 +1537,11 @@ function zoom(set, card){
     const txt = v.trim(), num = parseFloat(txt.replace(",", ".").replace(/[^0-9.]/g, ""));
     if (txt === ""){ delete card.price; delete card.cur; delete card.manual; }
     else if (!isFinite(num) || num < 0){ toast("Enter a number, like 12.50."); return; }
-    else { card.price = Math.round(num * 100) / 100; card.cur = card.cur || "USD"; card.manual = true; }
+    else { card.price = Math.round(num * 100) / 100; card.cur = card.cur || state.curShow || "USD"; card.manual = true; }
     try { await store.saveSet(set); } catch { toast("Couldn\u2019t save that price."); }
     let el = m.querySelector(".vval"); const html = valHTML(card, set);
     if (el) el.outerHTML = html || ""; else if (html) m.querySelector(".vhint").insertAdjacentHTML("beforebegin", html);
+    const vv = m.querySelector(".vval.dim:not(:first-of-type)"); if (vv && /^Versions/.test(vv.textContent) && card.manual) vv.remove();
     vb.textContent = card.price != null ? "Edit price" : "Set price"; dirty = true;
   };
   const close = () => { stop(); m.remove(); document.removeEventListener("keydown", onKey); if (dirty && tab === "binder") renderBinder(); };
@@ -1588,7 +1641,7 @@ function normalizeCards(raw, list, noMap){
     const hp = c.hp ?? c.health ?? "";
     const atk = Array.isArray(c.attacks) && c.attacks[0] ? c.attacks[0] : null;
     const rarity = normalizeRarity(mapVal("mrar") ? getPath(c, mapVal("mrar")) : c.rarity), pr = priceFromRaw(c, rarity);
-    return {id, no:i + 1, name, rarity, ...(pr ? {price:Math.round(pr.price * 100) / 100, cur:pr.cur} : {}), type:String(type), hp:String(hp),
+    return {id, no:i + 1, name, rarity, ...(pr ? {price:Math.round(pr.price * 100) / 100, cur:pr.cur, ...(pr.vars && Object.keys(pr.vars).length > 1 ? {pv:pr.vars, pa:Math.round(pr.price * 100) / 100} : {})} : {}), type:String(type), hp:String(hp),
       move: c.move ?? atk?.name ?? "", dmg: c.dmg ?? c.damage ?? atk?.damage ?? "", image: typeof img === "string" ? img : null,
       thumb: (typeof c.thumb === "string" && c.thumb) || (c.images && typeof c.images.small === "string" && c.images.small !== img ? c.images.small : null)};
   });
@@ -1681,7 +1734,7 @@ function collStats(){
       const k = set.id + ":" + c.id, q = state.owned[k]; if (!q) continue;
       got++; st.unique++; st.copies += q; if (q > 1) st.dupes += q - 1;
       const r = rankOfCard(c); if (r >= 4) st.ultra++; if (r >= 3) st.holo++; if (r >= 2) st.rare++;
-      if (c.price != null && (c.cur || "USD") === "USD"){ st.value += c.price * q; if (c.price > st.best) st.best = c.price; }
+      if (c.price != null){ const usd = toUSD(c.price, c.cur); if (usd != null){ st.value += usd * q; if (usd > st.best) st.best = usd; } }
       if (state.phys && state.phys[k]) st.hand++;
     }
     if (got){ st.sets++; const pct = got / set.cards.length * 100; if (pct > st.bestPct) st.bestPct = pct; if (got >= set.cards.length) st.complete++; }
@@ -1927,11 +1980,14 @@ async function shareCode(text){
 function openTrade(){
   const m = document.createElement("div"); m.className = "modal trade"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", "Trade with a friend");
   m.innerHTML = `<div class="tbox" id="tbox"></div>`; document.body.appendChild(m);
-  const box = $("#tbox", m); let pc = null, dc = null, role = null, mine = new Map(), theirs = [], lockMine = false, lockTheirs = null, executed = false, ended = false;
+  const box = $("#tbox", m); let pc = null, dc = null, role = null, mine = new Map(), theirs = [], lockMine = false, lockTheirs = null, executed = false, ended = false, screen = "intro";
   const send = o => { try { if (dc && dc.readyState === "open") dc.send(JSON.stringify(o)); } catch {} };
   const onKey = e => { if (e.key === "Escape") close(); };
   const close = () => { ended = true; try { send({k:"bye"}); dc && dc.close(); pc && pc.close(); } catch {} m.remove(); document.removeEventListener("keydown", onKey); if (tab === "binder") renderBinder(); };
   document.addEventListener("keydown", onKey);
+  const pickerNote = () => { const el = $("#pnote", m); if (!el) return; el.textContent = `Your friend is offering ${theirs.length ? theirs.map(p => p.n + " \u00d7" + p.q).join(", ") : "nothing yet"}.` + (lockTheirs ? " They have locked in." : ""); };
+  /* a message from your friend must never throw you out of the screen you are on */
+  const refresh = () => { if (executed) return; if (screen === "picker") pickerNote(); else if (screen === "board") board(); };
   const myList = () => [...mine.values()], tkey = (sid, id) => sid + "|" + id;
   const sigOf = () => { const my = myList().map(x => tkey(sidOf(x.set), x.card.id) + "x" + x.q).sort().join(","), th = theirs.map(p => tkey(p.s, p.id) + "x" + p.q).sort().join(","); return role === "host" ? `H[${my}]G[${th}]` : `H[${th}]G[${my}]`; };
   const tmpCard = p => ({set:{builtIn:false, scan:!!p.i, name:p.sn, cards:[]}, card:{id:p.id, name:p.n, rarity:RARITY[p.r] ? p.r : "common", image:p.i || null, thumb:p.t || null, hp:p.hp, type:p.ty, price:p.p == null ? undefined : p.p, cur:p.c}});
@@ -1942,14 +1998,14 @@ function openTrade(){
     ch.onclose = () => { if (!ended && !executed) note("The connection closed. Start a new trade to try again.", true); };
     ch.onmessage = e => {
       let o; try { o = JSON.parse(e.data); } catch { return; }
-      if (o.k === "offer" && Array.isArray(o.items) && o.items.length <= 60 && o.items.every(okPayload)){ theirs = o.items; lockMine = false; lockTheirs = null; if (!executed) board(); }
-      else if (o.k === "lock" && typeof o.sig === "string"){ lockTheirs = o.sig; if (!executed) board(); maybeRun(); }
-      else if (o.k === "unlock"){ lockTheirs = null; if (!executed) board(); }
+      if (o.k === "offer" && Array.isArray(o.items) && o.items.length <= 60 && o.items.every(okPayload)){ theirs = o.items; lockMine = false; lockTheirs = null; refresh(); }
+      else if (o.k === "lock" && typeof o.sig === "string"){ lockTheirs = o.sig; refresh(); maybeRun(); }
+      else if (o.k === "unlock"){ lockTheirs = null; refresh(); }
       else if (o.k === "bye" && !executed && !ended) note("Your friend left the trade.", true);
     };
   };
   const mkPc = () => { pc = new RTCPeerConnection({iceServers:ICE}); pc.onconnectionstatechange = () => { if (pc && pc.connectionState === "failed" && !ended && !executed) note("Couldn\u2019t connect. Both phones need internet. Try the same Wi\u2011Fi, or start again.", true); }; };
-  const note = (t, bad) => { const el = $("#tnote", m); if (el){ el.textContent = t; el.classList.toggle("err", !!bad); } };
+  const note = (t, bad) => { const el = $("#tnote", m); if (el){ el.textContent = t; el.classList.toggle("err", !!bad); } else toast(t); };
   const pushOffer = () => { lockMine = false; lockTheirs = null; send({k:"offer", items:myList().map(x => payloadOf(x.set, x.card, x.q))}); };
   const maybeRun = async () => {
     if (!lockMine || !lockTheirs || executed || lockTheirs !== sigOf()) return; executed = true;
@@ -2004,7 +2060,7 @@ function openTrade(){
     $("#tshare", m).onclick = () => shareCode("Wildmoor trade reply:\n" + replyCode);
   }
   function board(){
-    if (executed) return;
+    if (executed) return; screen = "board";
     const gv = fmtTotals(sumItems(myList().map(x => ({card:x.card, q:x.q})))), tv = fmtTotals(sumItems(theirs.map(p => ({card:tmpCard(p).card, q:p.q}))));
     const status = lockMine && lockTheirs ? "Finishing\u2026" : lockMine ? "You locked in. Waiting for your friend." : lockTheirs ? "Your friend locked in. Check the cards, then lock in." : "Pick your cards, then lock in. Both of you must lock in on the same trade.";
     box.innerHTML = `<h2>Trade</h2>
@@ -2018,15 +2074,16 @@ function openTrade(){
     box.querySelectorAll("#tmine [data-rm]").forEach(b => b.onclick = () => { const it = myList()[+b.dataset.rm]; if (!it) return; it.q--; if (it.q <= 0) mine.delete(tkey(sidOf(it.set), it.card.id)); pushOffer(); board(); });
   }
   function picker(){
-    const list = tradables();
-    box.innerHTML = `<h2>Your spare cards</h2><p>Tap a card to add one copy to the trade.</p>${list.length ? `<div class="grid">${list.slice(0, 120).map((x, i) => `<button class="slotbtn" data-i="${i}" aria-label="${esc(x.card.name)}, ${x.q} spare">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}<span class="qty">\u00d7${x.q}</span></button>`).join("")}</div>` : `<p class="tlog">You have no duplicate cards yet. Open more packs!</p>`}<div class="row" style="margin-top:14px"><button class="btn" id="pdone">Done</button></div>`;
+    screen = "picker"; const list = tradables();
+    box.innerHTML = `<h2>Your spare cards</h2><p>Tap a card to add one copy to the trade.</p><p id="pnote" class="tlog"></p>${list.length ? `<div class="grid">${list.slice(0, 120).map((x, i) => `<button class="slotbtn" data-i="${i}" aria-label="${esc(x.card.name)}, ${x.q} spare">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}<span class="qty">\u00d7${x.q}</span></button>`).join("")}</div>` : `<p class="tlog">You have no duplicate cards yet. Open more packs!</p>`}<div class="row" style="margin-top:14px"><button class="btn" id="pdone">Done</button></div>`;
     box.querySelectorAll(".grid .slotbtn").forEach(b => b.onclick = () => {
       const x = list[+b.dataset.i], k = tkey(sidOf(x.set), x.card.id), cur = mine.get(k) || {set:x.set, card:x.card, q:0};
       if (cur.q >= x.q){ toast("That\u2019s all your spares of this card."); return; } cur.q++; mine.set(k, cur); pushOffer(); toast(`${x.card.name}: ${cur.q} in the trade.`);
     });
-    $("#pdone", m).onclick = board;
+    $("#pdone", m).onclick = board; pickerNote();
   }
   function done(res){
+    screen = "done";
     box.innerHTML = `<h2>Trade complete</h2><p>You gave ${esc(res.gave.join(", ") || "nothing")}.</p><p>You got ${esc(res.got.join(", ") || "nothing")}.</p><div class="row" style="justify-content:flex-start"><button class="btn" id="tfin">Done</button></div>`;
     $("#tfin", m).onclick = close; buzz([30, 40, 60]); try { send({k:"done"}); } catch {}
   }
@@ -2151,7 +2208,7 @@ function openScanner(){
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; const b = $("#pwainstall"); if (b) b.hidden = false; });
 window.addEventListener("appinstalled", () => { installEvt = null; const b = $("#pwainstall"); if (b) b.hidden = true; });
-const BUILD = 28;
+const BUILD = 31;
 const isHosted = () => /^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname);
 async function latestBuild(){ const r = await fetch("sw.js?" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/wildmoor-v(\d+)/); return m ? +m[1] : 0; }
 async function applyUpdate(latest){
@@ -2343,6 +2400,24 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers arenâ
     <div class="row" style="justify-content:flex-start"><button class="btn" id="pset">Update this set</button><button class="btn ghost" id="pall">Update every set I have cards in</button></div>
     <p class="status" id="pstatus" aria-live="polite"></p>
     ${(() => { const a = activeSet(); if (a.builtIn) return ""; const n = a.cards.filter(c => c.price != null).length; return `<p class="hint" id="pcover" style="text-align:left;margin:0 0 10px">${n} of ${a.cards.length} cards in \u201c${esc(a.name)}\u201d have a price.</p>`; })()}
+    <h3 class="sect" style="margin-top:14px">Which version\u2019s price</h3>
+    <p style="margin:0 0 8px">Old cards, like Base Set Charizard, come in several versions with very different prices. The picture may show a 1st Edition card, while the standard price is for the later Unlimited print.</p>
+    <div class="filters" style="position:static;margin:0 0 6px;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none" role="group" aria-label="Which version's price">
+      <button class="chip" data-pvm="auto" aria-pressed="${(state.priceVariant || "auto") === "auto"}">Standard</button>
+      <button class="chip" data-pvm="first" aria-pressed="${state.priceVariant === "first"}">1st Edition</button>
+      <button class="chip" data-pvm="high" aria-pressed="${state.priceVariant === "high"}">Highest</button>
+    </div>
+    <p class="hint" style="text-align:left;margin:0 0 6px">Update prices again to load every version\u2019s price.</p>
+    <h3 class="sect" style="margin-top:14px">Currency</h3>
+    <div class="field"><label for="curpick">Show values in</label><select id="curpick" style="max-width:none;width:100%"><option value="">The currency the source gives</option>${Object.keys(CURNAMES).map(k => `<option value="${k}"${state.curShow === k ? " selected" : ""}>${k}, ${CURNAMES[k]}</option>`).join("")}</select></div>
+    <p class="hint" id="ratestat" style="text-align:left;margin:0 0 8px">${state.rates ? `Exchange rates from ${esc(state.rates.src || "the internet")}, ${esc(state.rates.date || new Date(state.rates.t).toLocaleDateString())}.` : "No exchange rates yet. They download when you pick a currency."}</p>
+    <div class="row" style="justify-content:flex-start"><button class="btn ghost small" id="ratesbtn">Refresh exchange rates</button></div>
+    <details style="margin:8px 0 12px"><summary>Set a rate by hand</summary>
+      <p style="margin:8px 0">For when you are offline, or want your own rate. How many of this currency equal 1 US dollar?</p>
+      <div class="row" style="justify-content:flex-start;align-items:center"><select id="mrcur" style="max-width:130px">${Object.keys(CURNAMES).filter(k => k !== "USD").map(k => `<option value="${k}">${k}</option>`).join("")}</select><input type="text" id="mrval" inputmode="decimal" placeholder="e.g. 18.50" style="width:120px"><button class="btn ghost small" id="mrsave">Save</button></div>
+      <p class="status" id="mrstat"></p>
+      ${Object.keys(state.manualRates || {}).length ? `<p class="hint" style="text-align:left">Your rates: ${Object.entries(state.manualRates).map(([k, v]) => `${esc(k)} ${esc(String(v))}`).join(", ")}. <button class="btn ghost small" id="mrclear">Clear</button></p>` : ""}
+    </details>
     <div class="filters" style="position:static;margin:8px 0 8px;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none" role="group" aria-label="Price new pulls automatically">
       <button class="chip" data-ap="on" aria-pressed="${state.autoPrice !== false}">Price new pulls automatically</button>
       <button class="chip" data-ap="off" aria-pressed="${state.autoPrice === false}">Off</button>
@@ -2423,7 +2498,7 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers arenâ
     <p class="hint" style="text-align:left;margin:10px 0 0">On iPhone, tap the Share icon in Safari, then Add to Home Screen.</p>
   </section>
   <p class="hint" style="margin:6px 0 0;text-align:left">Fan-made and unofficial. PokÃ©mon and its card images belong to their owners. This app bundles none of them. It loads images and prices from public sources you choose.</p>
-  <p class="hint" style="margin:6px 0 0">Version ${BUILD} Â· QR trading</p>
+  <p class="hint" style="margin:6px 0 0">Version ${BUILD} Â· trade fix</p>
   ${isHosted() ? `<div class="row" style="margin-top:6px"><button class="btn ghost small" id="chkupd">Check for updates</button></div>` : ""}`;
   $("#ijsonfile").onchange = async e => { const f = e.target.files[0]; if (f){ $("#ijson").value = await f.text(); } };
   $("#ido").onclick = doImport;
@@ -2452,6 +2527,20 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers arenâ
   $("#ggen").onclick = generateBack;
   const mp = $("#motionperm"); if (mp) mp.onclick = async () => { try { const r = await DeviceOrientationEvent.requestPermission(); toast(r === "granted" ? "Motion tilt on." : "Motion tilt was not allowed."); } catch { toast("Couldn\u2019t turn on motion tilt."); } };
   const cu = $("#chkupd"); if (cu) cu.onclick = checkUpdate;
+  v.querySelectorAll("[data-pvm]").forEach(b => b.onclick = () => {
+    state.priceVariant = b.dataset.pvm; applyVariant(); persist();
+    v.querySelectorAll("[data-pvm]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    toast(state.priceVariant === "first" ? "Using 1st Edition prices where there are any." : state.priceVariant === "high" ? "Using the highest price of any version." : "Using the standard price.");
+  });
+  const rs = $("#ratestat"), setRs = (t, bad) => { if (rs){ rs.textContent = t; rs.style.color = bad ? "#C0392B" : ""; } };
+  $("#curpick").onchange = async e => {
+    state.curShow = e.target.value; persist();
+    if (state.curShow && !rateOf(state.curShow)){ setRs("Getting exchange rates\u2026"); try { await refreshRates(); render(); toast("Showing values in " + state.curShow + "."); } catch { setRs("Couldn\u2019t get exchange rates. Check your connection, or set a rate by hand below.", true); } }
+    else { render(); toast(state.curShow ? "Showing values in " + state.curShow + "." : "Showing values as the source gives them."); }
+  };
+  $("#ratesbtn").onclick = async () => { setRs("Refreshing\u2026"); try { await refreshRates(); render(); toast("Exchange rates updated."); } catch { setRs("Couldn\u2019t get exchange rates. Check your connection.", true); } };
+  $("#mrsave").onclick = () => { const c = $("#mrcur").value, v = parseFloat(String($("#mrval").value).replace(",", ".")), ms = $("#mrstat"); if (!(v > 0)){ ms.textContent = "Enter a number above zero."; ms.classList.add("err"); return; } state.manualRates = state.manualRates || {}; state.manualRates[c] = v; persist(); render(); toast(`1 USD = ${v} ${c}.`); };
+  const mc = $("#mrclear"); if (mc) mc.onclick = () => { state.manualRates = {}; persist(); render(); toast("Your rates were cleared."); };
   $("#bkgo").onclick = makeBackup; $("#bkfile").onchange = restoreBackup;
   const pi = $("#pwainstall"); pi.hidden = !installEvt; pi.onclick = async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; pi.hidden = true; };
   $("#shareapp").onclick = () => shareText("Try Wildmoor Packs, a card pack opening app.");
@@ -2542,7 +2631,7 @@ async function doImport(){
   store = await initStore();
   try { const s = await store.load(); if (s) state = Object.assign(DEFAULT_STATE(), s); } catch (e) { console.warn(e); }
   try { const extra = await store.listSets(); sets = [WILDMOOR, ...extra.filter(s => s && Array.isArray(s.cards))]; } catch (e) { console.warn(e); }
-  document.body.classList.toggle("nofoil", !!state.noFoil); applyLite(); checkAch(true);
+  document.body.classList.toggle("nofoil", !!state.noFoil); applyLite(); applyVariant(); checkAch(true);
   if (isHosted()){
     const l = document.createElement("link"); l.rel = "manifest"; l.href = "manifest.webmanifest"; document.head.appendChild(l);
     const ic = document.createElement("link"); ic.rel = "apple-touch-icon"; ic.href = "icon-192.png"; document.head.appendChild(ic);
@@ -2552,6 +2641,7 @@ async function doImport(){
       navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) toast("Updated. Close and reopen the app for the newest version."); });
     }
   }
+  if (state.curShow && (!state.rates || Date.now() - state.rates.t > 864e5)) setTimeout(() => { refreshRates().then(() => render()).catch(() => {}); }, 3000);
   if (isHosted()) setTimeout(async () => { try { const l = await latestBuild(); if (l > BUILD) showUpdateBar(l); } catch {} }, 2500);
   render();
 })();
