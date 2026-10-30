@@ -48,8 +48,10 @@ For your friends
 Trading between friends
 -----------------------
 In the Binder tab, "Trade with a friend" lets two people swap duplicate cards
-directly between their phones. They connect by sending each other short codes
-(for example over WhatsApp). No account and no server of yours is needed.
+directly between their phones. They connect by scanning each other's QR codes
+when they are together, or by sending short codes (for example over WhatsApp) when
+they are apart. No account and no server of yours is needed. Scanning uses the phone's
+built-in QR reader, or loads a small reader from the internet on iPhone.
 The phones use free public STUN helper servers (Google, Cloudflare) only to find
 each other. Cards never pass through them. If two phones on mobile data cannot
 connect, try both on the same Wi-Fi. Trades run on trust, so only trade with friends.
