@@ -454,6 +454,63 @@ body.lite .stage.home::before{filter:none}
 body.lite .pack{filter:drop-shadow(0 14px 14px rgba(8,4,18,.45))}
 /* iPhone: stop Safari zooming the page when a field is tapped */
 @supports (-webkit-touch-callout:none){input,textarea,select{font-size:16px!important}}
+/* achievements */
+.sect{font-family:var(--display);font-size:.95rem;letter-spacing:-.02em;margin:18px 2px 8px;color:var(--muted)}
+.awards{display:grid;gap:10px}
+.award{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.award:not(.got){opacity:.92}
+.aicon{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--muted)}
+.aicon svg{width:22px;height:22px;fill:currentColor}
+.aicon.on{background:linear-gradient(145deg,#FFE9A6,#E2A92B);color:#4A3000;box-shadow:0 4px 12px rgba(226,169,43,.35)}
+.abody{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.abody b{font-family:var(--display);font-size:.95rem;letter-spacing:-.02em}
+.abody span{font-size:.84rem;color:var(--muted)}
+.abody small{font-size:.76rem;color:var(--muted)}
+.abar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin:5px 0 2px}
+.abar i{display:block;height:100%;background:linear-gradient(90deg,var(--moss),var(--heather))}
+.achpop{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:70;display:flex;gap:12px;align-items:center;max-width:92vw;padding:10px 18px 10px 10px;border-radius:99px;background:#1B1724;color:#F1EEF8;border:1px solid rgba(242,194,75,.5);box-shadow:0 12px 34px rgba(0,0,0,.5);animation:achin .45s cubic-bezier(.2,.8,.3,1.2)}
+.achpop.out{opacity:0;transform:translate(-50%,-14px);transition:opacity .3s,transform .3s}
+.achpop small{display:block;font-size:.7rem;color:#F2C24B;letter-spacing:.02em;white-space:nowrap}
+.achpop b{font-family:var(--display);font-size:.95rem;letter-spacing:-.02em}
+@keyframes achin{from{opacity:0;transform:translate(-50%,-26px) scale(.9)}}
+.scope .chip{font-size:.78rem;padding:10px 2px}
+/* in-hand tag and scanner */
+.slotbtn .hand{position:absolute;right:4px;top:4px;z-index:8;font:700 .56rem var(--display);letter-spacing:.02em;background:#F2C24B;color:#3A2600;padding:2px 7px;border-radius:99px;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.scanner{justify-content:flex-start;overflow-y:auto;gap:12px}
+.scanbox{position:relative;flex:none;width:min(80vw,320px);aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:#000}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:7% 9%;border:2px solid rgba(255,255,255,.9);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.42)}
+.scanmsg{max-width:90vw;text-align:center;font-size:.92rem}
+.scanq{width:min(92vw,420px);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.scanres{width:min(92vw,420px);display:grid;gap:8px;padding-bottom:30px}
+.srow{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px}
+.sthumb{flex:none;width:58px}
+.sinfo{flex:1;min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.sinfo b{font-family:var(--display);font-size:.9rem;letter-spacing:-.02em}
+.sinfo span,.sinfo small{font-size:.78rem;color:var(--muted)}
+.sact{display:flex;flex-direction:column;gap:6px;flex:none}
+/* cards stacked behind the one you swipe */
+.cardwrap{--cw:min(72vw,290px)}
+.cardwrap .ghost{position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:63/88;border-radius:4.5% / 3.2%;overflow:hidden;z-index:0;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.4);transform:translate(-50%,calc(-50% + var(--n) * 19px)) scale(calc(1 - var(--n) * .06));opacity:calc(1 - var(--n) * .18)}
+.cardwrap .ghost.g1{--n:1}.cardwrap .ghost.g2{--n:2}
+.cardwrap .ghost img,.cardwrap .ghost svg{width:100%;height:100%;display:block;object-fit:cover}
+/* random pack + trading */
+.packmode{width:min(92vw,360px);margin:0}
+.trade{justify-content:flex-start;overflow-y:auto;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+.tbox{width:min(92vw,460px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:30px}
+.tbox h2{font-family:var(--display);font-size:1.25rem;letter-spacing:-.03em;margin:0 0 8px}
+.tbox p{color:var(--muted)!important;font-size:.92rem;margin:0 0 12px}
+.tbox .sect{margin:14px 2px 8px}
+.codebox{width:100%;margin:6px 0 10px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.74rem;color:var(--ink);word-break:break-all;resize:none;min-height:0}
+.tlist{display:grid;gap:8px}
+.trow{display:flex;gap:10px;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:16px;padding:8px}
+.tq{font-family:var(--display);font-weight:700;flex:none}
+.tlog{font-size:.84rem;margin:0 0 6px!important}
+.tstat{margin:12px 0!important}
+#tnote.err{color:#C0392B!important}
+.tbox .grid{margin-top:8px}
+/* update bar */
+.updbar{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:75;display:flex;gap:10px;align-items:center;padding:8px 10px 8px 16px;border-radius:99px;background:#1B1724;color:#F1EEF8;border:1px solid rgba(183,155,240,.6);box-shadow:0 12px 34px rgba(0,0,0,.5);font-size:.9rem;font-weight:600;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -897,7 +954,7 @@ function attachTilt(el){
 }
 
 /* ================= Storage ================= */
-const DEFAULT_STATE = () => ({owned:{}, packs:0, active:"wildmoor", back:null, faceDown:false, noFoil:false, imgQuality:"sharp", history:[], showPrices:true, priceUrl:"", autoPrice:true, lite:null});
+const DEFAULT_STATE = () => ({owned:{}, packs:0, active:"wildmoor", back:null, faceDown:false, noFoil:false, imgQuality:"sharp", history:[], showPrices:true, priceUrl:"", autoPrice:true, lite:null, phys:{}, ach:{}, stats:{pulled:0}, days:[], packMode:"set", trades:0, traded:0, tradeLog:[]});
 function localStore(){
   const get = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } };
   const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
@@ -1029,25 +1086,38 @@ function makePack(set){
 }
 
 /* ================= Open view ================= */
+let rndPick = null;
+function randomSet(){
+  if (rndPick && sets.includes(rndPick)) return rndPick;
+  const pool = sets.filter(x => !x.builtIn && x.cards.length), src = pool.length ? pool : [WILDMOOR];
+  rndPick = src[Math.floor(Math.random() * src.length)]; return rndPick;
+}
+const packSet = () => state.packMode === "random" ? randomSet() : activeSet();
+const sessionSet = () => (session && sets.find(x => x.id === session.set)) || activeSet();
+function mysterySVG(){
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="my-g" cx=".5" cy=".4" r=".75"><stop offset="0" stop-color="#5A3992"/><stop offset="1" stop-color="#1D1233"/></radialGradient></defs><rect width="100" height="100" fill="url(#my-g)"/><circle cx="50" cy="50" r="38" fill="none" stroke="#F2C24B" stroke-opacity=".5" stroke-dasharray="2 4"/><text x="50" y="69" text-anchor="middle" font-family="Sora,Trebuchet MS,sans-serif" font-weight="800" font-size="58" fill="#F2C24B">?</text></svg>`;
+}
 function renderOpen(){
   document.body.classList.remove("dim");
-  const set = activeSet(); const v = $("#view");
+  const v = $("#view");
+  if (session){ if (sets.some(x => x.id === session.set)){ if (session.idx < session.cards.length) renderReveal(); else renderSummary(); return; } session = null; }
+  const rnd = state.packMode === "random", set = packSet();
   if (!set.cards.length){ v.innerHTML = `<div class="empty"><p>This set has no cards yet.</p><button class="btn" id="goImp">Go to Import</button></div>`; $("#goImp").onclick = () => { tab = "import"; render(); }; return; }
-  if (!session || session.set !== set.id){
-    const owned = Object.keys(state.owned).filter(k => k.startsWith(set.id + ":")).length;
-    const hero = set.builtIn ? creatureSVG(WILDMOOR.cards[30]) : (set.cards.find(c => c.image) ? imgHTML(srcFor(set.cards.find(c => c.image), false), set.name, true) : "");
-    v.innerHTML = `<div class="stage home">
+  const pool = sets.filter(x => !x.builtIn && x.cards.length);
+  const ownedN = rnd ? pool.reduce((n, x) => n + x.cards.filter(c => state.owned[ownKey(x, c)]).length, 0) : Object.keys(state.owned).filter(k => k.startsWith(set.id + ":")).length;
+  const totalN = rnd ? (pool.reduce((n, x) => n + x.cards.length, 0) || set.cards.length) : set.cards.length;
+  const hero = rnd ? mysterySVG() : set.builtIn ? creatureSVG(WILDMOOR.cards[30]) : emblemSVG();
+  v.innerHTML = `<div class="stage home">
       <div class="packzone" id="packzone">
         <svg class="slashfx fade" id="slash" aria-hidden="true"><path d=""/></svg>
-        ${packMarkup(set.name, hero)}
+        ${packMarkup(rnd ? "Mystery pack" : set.name, hero)}
       </div>
-      <div class="stats"><span class="stat"><b>${state.packs}</b> ${state.packs === 1 ? "pack" : "packs"} opened</span><span class="stat"><b>${owned}/${set.cards.length}</b> collected</span></div>
-      <p class="hint" id="packhint">Swipe across the pack to tear it open</p>
+      <div class="stats"><span class="stat"><b>${state.packs}</b> ${state.packs === 1 ? "pack" : "packs"} opened</span><span class="stat"><b>${ownedN}/${totalN}</b> collected</span></div>
+      <div class="scope packmode" role="group" aria-label="Pack type"><button class="chip" data-pm="set" aria-pressed="${!rnd}">Pick a set</button><button class="chip" data-pm="random" aria-pressed="${rnd}">Random pack</button></div>
+      <p class="hint" id="packhint">Swipe across the pack to tear it open${rnd ? ". The set is a surprise." : ""}</p>
     </div>`;
-    bindPack(); queuePack(set);
-    return;
-  }
-  if (session.idx < session.cards.length) renderReveal(); else renderSummary();
+  bindPack(); queuePack(set);
+  v.querySelectorAll("[data-pm]").forEach(b => b.onclick = () => { state.packMode = b.dataset.pm; rndPick = null; queued = null; session = null; persist(); renderOpen(); });
 }
 const PACK_CLIPS = (() => {
   const jit = [0, .9, -.4, .7, -.6, .5, -.3, .8, -.5, .6, -.7, .4, -.2, .9, -.6, .3, 0];
@@ -1060,6 +1130,10 @@ const PACK_CLIPS = (() => {
   const poly = pts => "polygon(" + pts.map(q => q[0].toFixed(2) + "% " + q[1].toFixed(2) + "%").join(",") + ")";
   return {top: poly(top), bot: poly(bot)};
 })();
+function emblemSVG(){
+  const petals = Array.from({length:8}, (_, k) => `<ellipse rx="7" ry="22" cy="-27" transform="rotate(${k * 45})"/>`).join("");
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="em-g" cx=".5" cy=".4" r=".75"><stop offset="0" stop-color="#5A3992"/><stop offset="1" stop-color="#1D1233"/></radialGradient></defs><rect width="100" height="100" fill="url(#em-g)"/><g transform="translate(50 50)"><circle r="40" fill="none" stroke="#F2C24B" stroke-opacity=".5" stroke-dasharray="2 4"/><g fill="#B79BF0" fill-opacity=".95" stroke="#F2C24B" stroke-opacity=".55" transform="scale(.9)">${petals}</g><circle r="8" fill="#F2C24B"/></g></svg>`;
+}
 function packMarkup(name, hero){
   const fx = '<div class="packholo"></div><div class="packglare"></div>';
   return `<button class="pack" id="pack" aria-label="Tear open a ${esc(name)} pack. Swipe across it, or press Enter." style="--clipTop:${PACK_CLIPS.top};--clipBot:${PACK_CLIPS.bot}">
@@ -1125,15 +1199,16 @@ function bindPack(){
   pack.addEventListener("click", e => { if (e.detail === 0 && !pack.dataset.busy && !done){ done = true; tearPack(1); } });
 }
 function tearPack(dir = 1){
-  const set = activeSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1";
-  const cards = (queued && queued.set === set.id) ? queued.cards : makePack(set); queued = null;
+  const set = packSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1";
+  const cards = (queued && queued.set === set.id) ? queued.cards : makePack(set); queued = null; if (state.packMode === "random") rndPick = null;
   const isNew = cards.map(c => !state.owned[ownKey(set, c)]);
   // de-dupe "new" within the same pack
   const seen = new Set(); cards.forEach((c, i) => { if (seen.has(c.id)) isNew[i] = false; seen.add(c.id); });
   cards.forEach(c => { const k = ownKey(set, c); state.owned[k] = (state.owned[k] || 0) + 1; });
-  state.packs++;
+  state.packs++; state.stats = state.stats || {pulled:0}; state.stats.pulled += cards.length;
+  { const day = new Date().toISOString().slice(0, 10); state.days = state.days || []; if (!state.days.includes(day)){ state.days.push(day); if (state.days.length > 800) state.days.shift(); } }
   state.history = state.history || []; state.history.unshift({t:Date.now(), s:set.id, c:cards.map(c => c.id)}); if (state.history.length > 400) state.history.length = 400;
-  persist();
+  persist(); setTimeout(() => checkAch(), 1600);
   session = {set:set.id, cards, isNew, idx:0, flipped:!state.faceDown};
   if (reduceMotion()){ renderOpen(); return; }
   pack.style.setProperty("--dir", dir); pack.style.setProperty("--tear", "1"); pack.style.setProperty("--origin", dir > 0 ? "0%" : "100%");
@@ -1145,13 +1220,14 @@ const rankOf = card => RARITY[card.rarity]?.rank ?? 0;
 const fxClass = card => ({rare:"fx-rare", holo:"fx-holo", ultra:"fx-ultra"})[card.rarity] || "";
 function noteText(s){ const c = s.cards[s.idx]; return RARITY[c.rarity].label + (s.isNew[s.idx] ? ", new!" : "") + (c.price != null ? ` Worth ${money(c.price, c.cur)}.` : ""); }
 function renderReveal(){
-  const set = activeSet(); const v = $("#view"); const s = session; const card = s.cards[s.idx];
+  const set = sessionSet(); const v = $("#view"); const s = session; const card = s.cards[s.idx];
   const w = "min(72vw, 290px)";
   v.innerHTML = `<div class="stage reveal">
-    <p class="count lift">Card ${s.idx + 1} of ${s.cards.length}</p>
+    <p class="count lift">Card ${s.idx + 1} of ${s.cards.length}${state.packMode === "random" ? ", " + esc(set.name) : ""}</p>
     <div class="dots lift" aria-hidden="true">${s.cards.map((c, i) => `<i class="${i < s.idx ? "done" : i === s.idx ? "cur" : ""}"></i>`).join("")}</div>
     <div class="cardwrap" id="cardwrap">
       <div class="fx" id="fx" aria-hidden="true"></div>
+      ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true">${backInner(set)}</div>`).join("")}
       <button class="stagebtn deal" id="flipBtn" aria-label="${s.flipped ? "Next card" : "Flip card"}">
         <div class="flipper ${s.flipped ? "shown" : ""}" id="flipper">${cardHTML(set, card, w, true)}</div>
         ${s.flipped && s.isNew[s.idx] ? '<span class="badge">New</span>' : ""}
@@ -1229,13 +1305,13 @@ function advance(dir = -1, up = false){
   setTimeout(() => { s.leaving = false; s.idx++; s.flipped = !state.faceDown; renderOpen(); }, reduceMotion() ? 0 : 340);
 }
 function renderSummary(){
-  const set = activeSet(); const v = $("#view"); const s = session;
+  const set = sessionSet(); const v = $("#view"); const s = session;
   const best = s.cards.reduce((bi, c, i) => rankOf(c) >= rankOf(s.cards[bi]) ? i : bi, 0);
   const order = [best, ...s.cards.map((c, i) => i).filter(i => i !== best)];
   const newCount = s.isNew.filter(Boolean).length, pv = fmtTotals(sumCards(s.cards));
   v.innerHTML = `<div class="stage" style="justify-content:flex-start">
     <p class="summary-title">${esc(s.cards[best].name)}, ${RARITY[s.cards[best].rarity].label.toLowerCase()}</p>
-    <p class="hint">${newCount ? `${newCount} new ${newCount === 1 ? "card" : "cards"} for your binder` : "All repeats this time"}${pv ? `. Pack worth about ${esc(pv)}.` : ""}</p>
+    <p class="hint">${state.packMode === "random" ? "From " + esc(set.name) + ". " : ""}${newCount ? `${newCount} new ${newCount === 1 ? "card" : "cards"} for your binder` : "All repeats this time"}${pv ? `. Pack worth about ${esc(pv)}.` : ""}</p>
     <div class="pulls">${order.map((i, k) => `<button class="slotbtn cell${k === 0 ? " best" : ""}" style="--i:${k}" data-i="${i}">${cardHTML(set, s.cards[i], "100%", k === 0)}${ptag(s.cards[i])}${s.isNew[i] ? '<span class="badge">New</span>' : ""}</button>`).join("")}</div>
     <div class="row"><button class="btn" id="again">Open another pack</button><button class="btn ghost" id="toBinder">View binder</button><button class="btn ghost" id="sharepull">Share</button></div>
   </div>`;
@@ -1251,15 +1327,15 @@ let binderScope = "set", allSort = "recent", allFilter = "all", allLimit = 60, p
 const cardIdx = new WeakMap();
 const cardById = (set, id) => { let m = cardIdx.get(set); if (!m){ m = new Map(set.cards.map(c => [c.id, c])); cardIdx.set(set, m); } return m.get(id); };
 const rankOfCard = c => (RARITY[c.rarity || "common"] || RARITY.common).rank;
-const scopeBar = () => `<div class="scope" role="group" aria-label="Collection view">${[["set","This set"],["all","All cards"],["packs","Packs"]].map(([k, l]) => `<button class="chip" data-scope="${k}" aria-pressed="${binderScope === k}">${l}</button>`).join("")}</div>`;
-function bindScope(v){ v.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { binderScope = b.dataset.scope; renderBinder(); window.scrollTo(0, 0); }); }
-function renderBinder(){ if (binderScope === "all") renderAllCards(); else if (binderScope === "packs") renderPacks(); else renderSetBinder(); }
+const scopeBar = () => `<div class="scope" role="group" aria-label="Collection view">${[["set","This set"],["all","All cards"],["packs","Packs"],["awards","Awards"]].map(([k, l]) => `<button class="chip" data-scope="${k}" aria-pressed="${binderScope === k}">${l}</button>`).join("")}</div><div class="row" style="justify-content:flex-start;margin:-4px 0 12px;gap:8px"><button class="btn ghost small" id="scanbtn">Scan or add a card you own</button><button class="btn ghost small" id="tradebtn">Trade with a friend</button></div>`;
+function bindScope(v){ v.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { binderScope = b.dataset.scope; renderBinder(); window.scrollTo(0, 0); }); const sb = v.querySelector("#scanbtn"); if (sb) sb.onclick = openScanner; const tb = v.querySelector("#tradebtn"); if (tb) tb.onclick = openTrade; }
+function renderBinder(){ if (binderScope === "all") renderAllCards(); else if (binderScope === "packs") renderPacks(); else if (binderScope === "awards") renderAwards(); else renderSetBinder(); }
 function renderAllCards(){
   const v = $("#view"), rec = new Map(); (state.history || []).forEach((h, idx) => h.c.forEach(id => { const k = h.s + ":" + id; if (!rec.has(k)) rec.set(k, idx); }));
   const all = []; for (const set of sets) for (let i = 0; i < set.cards.length; i++){ const c = set.cards[i], q = state.owned[ownKey(set, c)]; if (q) all.push({set, card:c, q, i}); }
   const copies = all.reduce((n, x) => n + x.q, 0), nsets = new Set(all.map(x => x.set.id)).size, val = fmtTotals(sumItems(all));
   const minR = {all:0, rare:2, holo:3, ultra:4}[allFilter] || 0, rk = x => rec.has(x.set.id + ":" + x.card.id) ? rec.get(x.set.id + ":" + x.card.id) : 1e9;
-  const list = all.filter(x => rankOfCard(x.card) >= minR);
+  const list = all.filter(x => allFilter === "dupes" ? dupQty(x.set, x.card) > 0 : rankOfCard(x.card) >= minR);
   list.sort(allSort === "rarity" ? (a, b) => rankOfCard(b.card) - rankOfCard(a.card) || rk(a) - rk(b)
     : allSort === "value" ? (a, b) => (b.card.price || 0) - (a.card.price || 0) || rankOfCard(b.card) - rankOfCard(a.card)
     : allSort === "set" ? (a, b) => a.set.name.localeCompare(b.set.name) || a.i - b.i
@@ -1268,8 +1344,8 @@ function renderAllCards(){
   v.innerHTML = `${scopeBar()}
     <div class="progress" style="grid-template-columns:1fr"><div class="pinfo"><div class="big">${all.length}<small> different cards</small></div>
       <div class="rar">${val ? `<span><b>${esc(val)}</b> total value</span>` : ""}<span>${copies} copies</span><span>${nsets} ${nsets === 1 ? "set" : "sets"}</span><span>${state.packs} ${state.packs === 1 ? "pack" : "packs"} opened</span></div></div></div>
-    <div class="filters" role="group" aria-label="Sort and filter">${chips([["recent","Newest"],["value","Most valuable"],["rarity","Best first"],["set","By set"]], "sort", allSort)}${chips([["all","Any rarity"],["rare","Rare+"],["holo","Holo+"],["ultra","Ultra"]], "af", allFilter)}</div>
-    ${list.length ? `<div class="grid">${list.slice(0, allLimit).map((x, k) => `<button class="slotbtn" data-k="${k}" aria-label="${esc(x.card.name)}, ${esc(x.set.name)}">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}${x.q > 1 ? `<span class="qty">\u00d7${x.q}</span>` : ""}</button>`).join("")}</div>${list.length > allLimit ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="more">Show more (${list.length - allLimit} left)</button></div>` : ""}`
+    <div class="filters" role="group" aria-label="Sort and filter">${chips([["recent","Newest"],["value","Most valuable"],["rarity","Best first"],["set","By set"]], "sort", allSort)}${chips([["all","Any rarity"],["dupes","Duplicates"],["rare","Rare+"],["holo","Holo+"],["ultra","Ultra"]], "af", allFilter)}</div>
+    ${list.length ? `<div class="grid">${list.slice(0, allLimit).map((x, k) => `<button class="slotbtn" data-k="${k}" aria-label="${esc(x.card.name)}, ${esc(x.set.name)}">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}${pbadge(x.set, x.card)}${x.q > 1 ? `<span class="qty">\u00d7${x.q}</span>` : ""}</button>`).join("")}</div>${list.length > allLimit ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="more">Show more (${list.length - allLimit} left)</button></div>` : ""}`
       : `<div class="empty"><p>${all.length ? "No cards match this filter." : "You don\u2019t own any cards yet. Open a pack to start your collection."}</p></div>`}`;
   bindScope(v);
   v.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { allSort = b.dataset.sort; allLimit = 60; renderBinder(); });
@@ -1296,7 +1372,7 @@ function renderSetBinder(){
   const pct = set.cards.length ? Math.round(owned.length / set.cards.length * 100) : 0;
   const sv = fmtTotals(sumItems(owned.map(card => ({card, q:state.owned[ownKey(set, card)]}))));
   const present = RANKS.filter(r => set.cards.some(c => (c.rarity || "common") === r));
-  const list = set.cards.map((c, i) => ({c, i})).filter(({c}) => binderFilter === "all" || (binderFilter === "owned" ? state.owned[ownKey(set, c)] : binderFilter === "missing" ? !state.owned[ownKey(set, c)] : (c.rarity || "common") === binderFilter));
+  const list = set.cards.map((c, i) => ({c, i})).filter(({c}) => binderFilter === "all" || (binderFilter === "owned" ? state.owned[ownKey(set, c)] : binderFilter === "missing" ? !state.owned[ownKey(set, c)] : binderFilter === "dupes" ? dupQty(set, c) > 0 : (c.rarity || "common") === binderFilter));
   v.innerHTML = `${scopeBar()}
     <div class="progress">
       <div class="ring" role="img" aria-label="${pct}% of ${esc(set.name)} collected"><svg viewBox="0 0 84 84" width="84" height="84"><circle cx="42" cy="42" r="35" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="42" cy="42" r="35" fill="none" stroke="var(--heather)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(220 * pct / 100).toFixed(1)} 220"/></svg><b>${pct}%</b></div>
@@ -1305,11 +1381,11 @@ function renderSetBinder(){
       </div>
     </div>
     <div class="filters" role="group" aria-label="Filter cards">
-      ${[["all","All"],["owned","Owned"],["missing","Missing"], ...present.map(r => [r, RARITY[r].label])].map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${binderFilter === k}">${l}</button>`).join("")}
+      ${[["all","All"],["owned","Owned"],["missing","Missing"],["dupes","Duplicates"], ...present.map(r => [r, RARITY[r].label])].map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${binderFilter === k}">${l}</button>`).join("")}
     </div>
     ${list.length ? `<div class="grid">${list.slice(0, binderLimit).map(({c, i}) => {
       const q = state.owned[ownKey(set, c)];
-      return q ? `<button class="slotbtn" data-i="${i}" aria-label="${esc(c.name)}, ${q} owned">${cardHTML(set, c, "100%")}${ptag(c)}${q > 1 ? `<span class="qty">×${q}</span>` : ""}</button>`
+      return q ? `<button class="slotbtn" data-i="${i}" aria-label="${esc(c.name)}, ${q} owned">${cardHTML(set, c, "100%")}${ptag(c)}${pbadge(set, c)}${q > 1 ? `<span class="qty">×${q}</span>` : ""}</button>`
                : `<div class="slot" aria-label="Missing card ${i + 1}"><span class="q">?</span><small>${i + 1}. ${RARITY[c.rarity || "common"].sym}</small></div>`;
     }).join("")}</div>${list.length > binderLimit ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="more">Show more (${list.length - binderLimit} left)</button></div>` : ""}` : `<div class="empty"><p>No cards match this filter.</p></div>`}
     <div class="row" style="margin-top:24px"><button class="btn ghost small" id="reset">Reset ${esc(set.name)} collection</button></div>`;
@@ -1319,7 +1395,7 @@ function renderSetBinder(){
   v.querySelectorAll(".grid .slotbtn").forEach(b => b.onclick = () => zoom(set, set.cards[+b.dataset.i]));
   $("#reset").onclick = () => {
     if (!confirm(`Remove every ${set.name} card from your binder? This can’t be undone.`)) return;
-    for (const k of Object.keys(state.owned)) if (k.startsWith(set.id + ":")) delete state.owned[k];
+    forgetSet(set.id);
     persist(); renderBinder(); toast("Collection reset.");
   };
 }
@@ -1329,13 +1405,13 @@ function valHTML(card, set){
 }
 function zoom(set, card){
   const m = document.createElement("div"); m.className = "modal viewer3d"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", card.name + ", 3D view");
-  const q = state.owned[ownKey(set, card)] || 0, big = !set.builtIn && card.image && thumbOf(card) && state.imgQuality !== "fast" ? false : true;
+  const q = state.owned[ownKey(set, card)] || 0, hand0 = (state.phys && state.phys[ownKey(set, card)]) || 0, big = !set.builtIn && card.image && thumbOf(card) && state.imgQuality !== "fast" ? false : true;
   m.innerHTML = `<div class="stage3d" id="stage3d"><div class="rot" id="rot">
       <div class="side front">${cardHTML(set, card, "100%", big, true)}<div class="sheen3d"></div></div>
       <div class="side back">${backInner(set)}</div></div></div>
     ${valHTML(card, set)}
-    <p class="vhint">${q} owned. Drag to rotate, pinch or scroll to zoom, double-tap to reset.</p>
-    <div class="row vrow"><button class="btn ghost small" id="vflip">Flip over</button><button class="btn ghost small" id="vreset">Reset</button>${set.builtIn ? "" : `<button class="btn ghost small" id="vprice">${card.price != null ? "Edit price" : "Set price"}</button>`}<button class="btn ghost small" id="zclose">Close</button></div>`;
+    <p class="vhint" id="vhint">${q} owned${hand0 ? `, ${hand0} in hand` : ""}. Drag to rotate, pinch or scroll to zoom, double-tap to reset.</p>
+    <div class="row vrow"><button class="btn ghost small" id="vflip">Flip over</button><button class="btn ghost small" id="vreset">Reset</button>${set.builtIn ? "" : `<button class="btn ghost small" id="vprice">${card.price != null ? "Edit price" : "Set price"}</button>`}${set.builtIn ? "" : `<button class="btn ghost small" id="vhand">I own this card</button>`}<button class="btn ghost small" id="zclose">Close</button></div>`;
   document.body.appendChild(m);
   if (!big){ const im = new Image(); im.onload = () => { const el = m.querySelector(".side.front img"); if (el) el.src = card.image; }; im.src = card.image; }
   const stage = $("#stage3d", m), rot = $("#rot", m), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -1380,6 +1456,8 @@ function zoom(set, card){
   stage.addEventListener("wheel", e => { e.preventDefault(); s = clamp(s * (e.deltaY < 0 ? 1.12 : .89), 1, 4); if (s < 1.02){ tx = 0; ty = 0; } apply(); }, {passive:false});
   $("#vflip", m).onclick = () => tween({rx:0, ry:Math.round(ry / 180) * 180 + 180, s:1, tx:0, ty:0});
   $("#vreset", m).onclick = reset;
+  const vh = $("#vhand", m);
+  if (vh) vh.onclick = () => { addPhysical(set, card); const hn = state.phys[ownKey(set, card)]; $("#vhint", m).textContent = `${state.owned[ownKey(set, card)]} owned, ${hn} in hand. Drag to rotate, pinch or scroll to zoom, double-tap to reset.`; toast(`Added. In hand: ${hn}.`); dirty = true; };
   const vb = $("#vprice", m);
   if (vb) vb.onclick = async () => {
     const v = prompt(`Price for ${card.name}${card.cur ? " (in " + card.cur + ")" : ""}. Leave empty to clear it.`, card.price != null ? String(card.price) : ""); if (v == null) return;
@@ -1571,11 +1649,373 @@ async function generateBack(){
     say(e instanceof TypeError ? netError("Google") : e.message, true);
   } finally { btn.disabled = false; }
 }
+/* ---------- Achievements ---------- */
+const dupQty = (set, c) => { const k = ownKey(set, c), q = state.owned[k] || 0, h = (state.phys && state.phys[k]) || 0; return Math.max(0, q - Math.max(1, h)); };
+function forgetSet(id){ for (const k of Object.keys(state.owned)) if (k.startsWith(id + ":")) delete state.owned[k]; for (const k of Object.keys(state.phys || {})) if (k.startsWith(id + ":")) delete state.phys[k]; }
+function collStats(){
+  const st = {unique:0, copies:0, dupes:0, holo:0, ultra:0, rare:0, hand:0, sets:0, bestPct:0, complete:0, value:0, best:0};
+  for (const set of sets){
+    let got = 0;
+    for (const c of set.cards){
+      const k = set.id + ":" + c.id, q = state.owned[k]; if (!q) continue;
+      got++; st.unique++; st.copies += q; if (q > 1) st.dupes += q - 1;
+      const r = rankOfCard(c); if (r >= 4) st.ultra++; if (r >= 3) st.holo++; if (r >= 2) st.rare++;
+      if (c.price != null && (c.cur || "USD") === "USD"){ st.value += c.price * q; if (c.price > st.best) st.best = c.price; }
+      if (state.phys && state.phys[k]) st.hand++;
+    }
+    if (got){ st.sets++; const pct = got / set.cards.length * 100; if (pct > st.bestPct) st.bestPct = pct; if (got >= set.cards.length) st.complete++; }
+  }
+  st.packs = state.packs; st.trades = state.trades || 0; st.traded = state.traded || 0;
+  const ds = [...new Set(state.days || [])].sort(); let run = 0, bestRun = 0, prev = null;
+  for (const d of ds){ const t = Date.parse(d + "T00:00:00Z"); run = prev !== null && t - prev === 864e5 ? run + 1 : 1; if (run > bestRun) bestRun = run; prev = t; }
+  st.days = ds.length; st.streak = bestRun; return st;
+}
+const ACH = [
+  {id:"pack1", t:"First rip", d:"Open your first pack", g:1, v:S => S.packs},
+  {id:"pack10", t:"Getting the hang of it", d:"Open 10 packs", g:10, v:S => S.packs},
+  {id:"pack50", t:"Pack addict", d:"Open 50 packs", g:50, v:S => S.packs},
+  {id:"pack250", t:"Booster legend", d:"Open 250 packs", g:250, v:S => S.packs},
+  {id:"cards25", t:"Starter collection", d:"Own 25 different cards", g:25, v:S => S.unique},
+  {id:"cards100", t:"Growing binder", d:"Own 100 different cards", g:100, v:S => S.unique},
+  {id:"cards500", t:"Serious collector", d:"Own 500 different cards", g:500, v:S => S.unique},
+  {id:"cards2000", t:"Archivist", d:"Own 2,000 different cards", g:2000, v:S => S.unique},
+  {id:"rare1", t:"Something shiny", d:"Own a rare or better card", g:1, v:S => S.rare},
+  {id:"holo5", t:"Holo hunter", d:"Own 5 different holo or better cards", g:5, v:S => S.holo},
+  {id:"holo25", t:"Rainbow vault", d:"Own 25 different holo or better cards", g:25, v:S => S.holo},
+  {id:"ultra1", t:"Jackpot", d:"Own an ultra rare", g:1, v:S => S.ultra},
+  {id:"ultra10", t:"Ultra collector", d:"Own 10 different ultra rares", g:10, v:S => S.ultra},
+  {id:"set25", t:"Quarter of the way", d:"Collect 25% of a set", g:25, v:S => Math.floor(S.bestPct), u:"%"},
+  {id:"set50", t:"Halfway there", d:"Collect 50% of a set", g:50, v:S => Math.floor(S.bestPct), u:"%"},
+  {id:"set75", t:"Nearly there", d:"Collect 75% of a set", g:75, v:S => Math.floor(S.bestPct), u:"%"},
+  {id:"set100", t:"Set complete", d:"Collect every card in a set", g:1, v:S => S.complete},
+  {id:"sets3", t:"Explorer", d:"Own cards from 3 different sets", g:3, v:S => S.sets},
+  {id:"sets10", t:"Globetrotter", d:"Own cards from 10 different sets", g:10, v:S => S.sets},
+  {id:"dupes10", t:"Doubles", d:"Hold 10 duplicate cards", g:10, v:S => S.dupes},
+  {id:"dupes50", t:"Trade stock", d:"Hold 50 duplicate cards", g:50, v:S => S.dupes},
+  {id:"best20", t:"Big find", d:"Own a card worth $20 or more", g:20, v:S => Math.floor(S.best), u:"$"},
+  {id:"val50", t:"Pocket money", d:"Collection worth $50", g:50, v:S => Math.floor(S.value), u:"$"},
+  {id:"val500", t:"Serious money", d:"Collection worth $500", g:500, v:S => Math.floor(S.value), u:"$"},
+  {id:"val5000", t:"Treasure room", d:"Collection worth $5,000", g:5000, v:S => Math.floor(S.value), u:"$"},
+  {id:"hand1", t:"In hand", d:"Add a card you own for real", g:1, v:S => S.hand},
+  {id:"hand25", t:"Real collector", d:"Add 25 different real cards", g:25, v:S => S.hand},
+  {id:"hand100", t:"Shelf of binders", d:"Add 100 different real cards", g:100, v:S => S.hand},
+  {id:"trade1", t:"First deal", d:"Complete a trade with a friend", g:1, v:S => S.trades},
+  {id:"trade5", t:"Swap meet", d:"Complete 5 trades", g:5, v:S => S.trades},
+  {id:"trade25", t:"Fair trader", d:"Trade away 25 cards in total", g:25, v:S => S.traded},
+  {id:"days3", t:"Regular", d:"Open packs on 3 different days", g:3, v:S => S.days},
+  {id:"days14", t:"Dedicated", d:"Open packs on 14 different days", g:14, v:S => S.days},
+  {id:"streak7", t:"Week streak", d:"Open packs 7 days in a row", g:7, v:S => S.streak}
+];
+const achQueue = []; let achShowing = false;
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>';
+function pumpAch(){
+  if (achShowing || !achQueue.length) return; achShowing = true;
+  const a = achQueue.shift(), el = document.createElement("div"); el.className = "achpop"; el.setAttribute("role", "status");
+  el.innerHTML = `<span class="aicon on">${STAR}</span><span><small>Achievement unlocked</small><b>${esc(a.t)}</b></span>`;
+  document.body.appendChild(el); buzz([30, 40, 30]);
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => { el.remove(); achShowing = false; pumpAch(); }, 350); }, 3000);
+}
+function checkAch(silent){
+  state.ach = state.ach || {}; const S = collStats(), fresh = [];
+  for (const a of ACH) if (!state.ach[a.id] && a.v(S) >= a.g){ state.ach[a.id] = Date.now(); fresh.push(a); }
+  if (fresh.length){ persist(); if (!silent){ fresh.forEach(a => achQueue.push(a)); pumpAch(); } }
+  return S;
+}
+function renderAwards(){
+  const v = $("#view"), S = checkAch(true), got = a => state.ach && state.ach[a.id], n = ACH.filter(got).length;
+  const num = (x, u) => (u === "$" ? "$" : "") + x.toLocaleString() + (u === "%" ? "%" : "");
+  const row = a => { const val = Math.min(a.g, a.v(S)), on = got(a);
+    return `<div class="award ${on ? "got" : ""}"><span class="aicon ${on ? "on" : ""}">${STAR}</span><div class="abody"><b>${esc(a.t)}</b><span>${esc(a.d)}</span>${on ? `<small>Unlocked ${esc(new Date(state.ach[a.id]).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"}))}</small>` : `<div class="abar"><i style="width:${Math.round(val / a.g * 100)}%"></i></div><small>${num(val, a.u)} of ${num(a.g, a.u)}</small>`}</div></div>`; };
+  const open = ACH.filter(a => !got(a)).sort((p, q) => q.v(S) / q.g - p.v(S) / p.g), done = ACH.filter(got).sort((p, q) => state.ach[q.id] - state.ach[p.id]);
+  v.innerHTML = `${scopeBar()}<div class="progress" style="grid-template-columns:1fr"><div class="pinfo"><div class="big">${n}<small> of ${ACH.length} achievements</small></div><div class="rar"><span>${state.packs} packs opened</span><span>${S.unique} different cards</span></div></div></div>
+    ${open.length ? `<h3 class="sect">In progress</h3><div class="awards">${open.map(row).join("")}</div>` : ""}
+    ${done.length ? `<h3 class="sect">Unlocked</h3><div class="awards">${done.map(row).join("")}</div>` : ""}`;
+  bindScope(v);
+}
+
+/* ---------- Trading with a friend (phone to phone, no server) ---------- */
+const sidOf = set => set.builtIn ? "wildmoor" : (setKey(set) || set.id);
+function tradables(){
+  const out = []; for (const set of sets) for (const card of set.cards){ const q = dupQty(set, card); if (q > 0) out.push({set, card, q}); }
+  out.sort((a, b) => (b.card.price || 0) - (a.card.price || 0) || a.card.name.localeCompare(b.card.name)); return out;
+}
+const payloadOf = (set, card, q) => ({s:sidOf(set), sn:set.name, ser:set.series || "", id:card.id, n:card.name, r:card.rarity || "common", i:card.image || "", t:card.thumb || "", hp:card.hp || "", ty:card.type || "", p:card.price == null ? null : card.price, c:card.cur || "", q});
+const okUrl = u => typeof u === "string" && (u === "" || /^https?:\/\//i.test(u)) && u.length < 400;
+function okPayload(p){
+  return p && typeof p === "object" && ["s","sn","id","n","r"].every(k => typeof p[k] === "string" && p[k].length > 0 && p[k].length < 120) && okUrl(p.i) && okUrl(p.t) && Number.isInteger(p.q) && p.q >= 1 && p.q <= 99;
+}
+function resolveCard(p){
+  let set = sets.find(x => sidOf(x) === p.s), changed = false;
+  if (!set){ set = {id:"trade-" + (slug(p.s) || "set"), name:p.sn, series:String(p.ser || "Trades").slice(0, 60), scan:true, cards:[]}; sets.push(set); changed = true; }
+  let card = set.cards.find(c => c.id === p.id);
+  if (!card){
+    card = {id:p.id, no:set.cards.length + 1, name:p.n, rarity:RARITY[p.r] ? p.r : "common", image:p.i || null};
+    if (p.t) card.thumb = p.t; if (typeof p.hp === "string" && p.hp) card.hp = p.hp.slice(0, 8); if (typeof p.ty === "string" && p.ty) card.type = p.ty.slice(0, 24);
+    if (typeof p.p === "number" && p.p >= 0){ card.price = p.p; card.cur = String(p.c || "USD").slice(0, 4); }
+    set.cards.push(card); changed = true;
+  } else if (card.price == null && typeof p.p === "number" && p.p >= 0){ card.price = p.p; card.cur = String(p.c || "USD").slice(0, 4); changed = true; }
+  return {set, card, changed};
+}
+async function applyTrade(give, get){
+  for (const g of give) if (dupQty(g.set, g.card) < g.q) throw new Error("A card you offered isn\u2019t spare anymore.");
+  for (const g of give){ const k = ownKey(g.set, g.card); state.owned[k] -= g.q; if (state.owned[k] <= 0) delete state.owned[k]; }
+  const touched = new Set(), got = [];
+  for (const p of get){ const r = resolveCard(p), k = ownKey(r.set, r.card); state.owned[k] = (state.owned[k] || 0) + p.q; if (r.changed) touched.add(r.set); got.push(`${p.n} \u00d7${p.q}`); }
+  const gave = give.map(g => `${g.card.name} \u00d7${g.q}`);
+  state.trades = (state.trades || 0) + 1; state.traded = (state.traded || 0) + give.reduce((n, g) => n + g.q, 0);
+  state.tradeLog = [{t:Date.now(), gave, got}, ...(state.tradeLog || [])].slice(0, 30);
+  for (const st of touched) if (!st.builtIn){ try { await store.saveSet(st); } catch {} }
+  persist(); checkAch(); return {gave, got};
+}
+const b64u = u8 => { let x = ""; u8.forEach(b => x += String.fromCharCode(b)); return btoa(x).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+const unb64u = t => { t = t.replace(/-/g, "+").replace(/_/g, "/"); while (t.length % 4) t += "="; return Uint8Array.from(atob(t), c => c.charCodeAt(0)); };
+async function encodeDesc(d){
+  const raw = new TextEncoder().encode(JSON.stringify({t:d.type, s:d.sdp}));
+  if (typeof CompressionStream === "undefined") return "WM1:" + b64u(raw);
+  return "WM2:" + b64u(new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()));
+}
+async function decodeDesc(text){
+  const m = String(text).match(/WM([12]):([A-Za-z0-9_-]+)/); if (!m) throw new Error("That doesn\u2019t look like a trade code. Paste the whole code.");
+  let bytes = unb64u(m[2]);
+  if (m[1] === "2"){ if (typeof DecompressionStream === "undefined") throw new Error("This browser can\u2019t read that code."); bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer()); }
+  const j = JSON.parse(new TextDecoder().decode(bytes)); if (!j || typeof j.s !== "string" || !["offer", "answer"].includes(j.t)) throw new Error("That code is damaged. Ask your friend to send it again.");
+  return {type:j.t, sdp:j.s};
+}
+const ICE = [{urls:["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]}, {urls:"stun:stun.cloudflare.com:3478"}];
+const gatherIce = pc => new Promise(res => { if (pc.iceGatheringState === "complete") return res(); const chk = () => { if (pc.iceGatheringState === "complete"){ pc.removeEventListener("icegatheringstatechange", chk); res(); } }; pc.addEventListener("icegatheringstatechange", chk); setTimeout(res, 4500); });
+async function shareCode(text){
+  try { if (navigator.share){ await navigator.share({title:"Wildmoor trade code", text}); return; } } catch (e) { if (e && e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(text); toast("Code copied. Paste it into a chat."); } catch { toast("Select the code and copy it by hand."); }
+}
+function openTrade(){
+  const m = document.createElement("div"); m.className = "modal trade"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", "Trade with a friend");
+  m.innerHTML = `<div class="tbox" id="tbox"></div>`; document.body.appendChild(m);
+  const box = $("#tbox", m); let pc = null, dc = null, role = null, mine = new Map(), theirs = [], lockMine = false, lockTheirs = null, executed = false, ended = false;
+  const send = o => { try { if (dc && dc.readyState === "open") dc.send(JSON.stringify(o)); } catch {} };
+  const onKey = e => { if (e.key === "Escape") close(); };
+  const close = () => { ended = true; try { send({k:"bye"}); dc && dc.close(); pc && pc.close(); } catch {} m.remove(); document.removeEventListener("keydown", onKey); if (tab === "binder") renderBinder(); };
+  document.addEventListener("keydown", onKey);
+  const myList = () => [...mine.values()], tkey = (sid, id) => sid + "|" + id;
+  const sigOf = () => { const my = myList().map(x => tkey(sidOf(x.set), x.card.id) + "x" + x.q).sort().join(","), th = theirs.map(p => tkey(p.s, p.id) + "x" + p.q).sort().join(","); return role === "host" ? `H[${my}]G[${th}]` : `H[${th}]G[${my}]`; };
+  const tmpCard = p => ({set:{builtIn:false, scan:!!p.i, name:p.sn, cards:[]}, card:{id:p.id, name:p.n, rarity:RARITY[p.r] ? p.r : "common", image:p.i || null, thumb:p.t || null, hp:p.hp, type:p.ty, price:p.p == null ? undefined : p.p, cur:p.c}});
+  const trow = (set, card, q, rm, i) => `<div class="trow"><div class="sthumb">${cardHTML(set, card, "100%")}</div><div class="sinfo"><b>${esc(card.name)}</b><span>${esc(set.name)}</span><small>${card.price != null ? esc(money(card.price, card.cur)) : "No price"}</small></div><span class="tq">\u00d7${q}</span>${rm ? `<button class="btn ghost small" data-rm="${i}" aria-label="Remove one">\u22121</button>` : ""}</div>`;
+  const wire = ch => {
+    dc = ch;
+    ch.onopen = () => { if (!ended) board(); };
+    ch.onclose = () => { if (!ended && !executed) note("The connection closed. Start a new trade to try again.", true); };
+    ch.onmessage = e => {
+      let o; try { o = JSON.parse(e.data); } catch { return; }
+      if (o.k === "offer" && Array.isArray(o.items) && o.items.length <= 60 && o.items.every(okPayload)){ theirs = o.items; lockMine = false; lockTheirs = null; if (!executed) board(); }
+      else if (o.k === "lock" && typeof o.sig === "string"){ lockTheirs = o.sig; if (!executed) board(); maybeRun(); }
+      else if (o.k === "unlock"){ lockTheirs = null; if (!executed) board(); }
+      else if (o.k === "bye" && !executed && !ended) note("Your friend left the trade.", true);
+    };
+  };
+  const mkPc = () => { pc = new RTCPeerConnection({iceServers:ICE}); pc.onconnectionstatechange = () => { if (pc && pc.connectionState === "failed" && !ended && !executed) note("Couldn\u2019t connect. Both phones need internet. Try the same Wi\u2011Fi, or start again.", true); }; };
+  const note = (t, bad) => { const el = $("#tnote", m); if (el){ el.textContent = t; el.classList.toggle("err", !!bad); } };
+  const pushOffer = () => { lockMine = false; lockTheirs = null; send({k:"offer", items:myList().map(x => payloadOf(x.set, x.card, x.q))}); };
+  const maybeRun = async () => {
+    if (!lockMine || !lockTheirs || executed || lockTheirs !== sigOf()) return; executed = true;
+    try { const res = await applyTrade(myList(), theirs); done(res); } catch (e) { executed = false; lockMine = false; send({k:"unlock"}); note(e.message || "The trade couldn\u2019t finish.", true); board(); }
+  };
+  const intro = () => {
+    const log = (state.tradeLog || []).slice(0, 4);
+    box.innerHTML = `<h2>Trade with a friend</h2>
+      <p>Swap spare cards directly between two phones. Nothing goes through a server. You each send a short code through WhatsApp or any chat to connect. Only duplicates can be traded, and trades run on trust, so only trade with friends. To find each other, the phones use free public helper servers from Google and Cloudflare. Your cards never pass through them.</p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" id="tstart">Start a trade</button><button class="btn ghost" id="tjoin">Join a trade</button></div>
+      ${log.length ? `<h3 class="sect">Recent trades</h3>${log.map(l => `<p class="tlog">${esc(new Date(l.t).toLocaleDateString(undefined, {month:"short", day:"numeric"}))}: gave ${esc(l.gave.join(", "))}. Got ${esc(l.got.join(", "))}.</p>`).join("")}` : ""}
+      <div class="row" style="justify-content:flex-start;margin-top:12px"><button class="btn ghost small" id="tclose">Close</button></div>`;
+    $("#tstart", m).onclick = host; $("#tjoin", m).onclick = guest; $("#tclose", m).onclick = close;
+  };
+  const codeBlock = code => `<textarea class="codebox" readonly rows="4" aria-label="Your trade code" onclick="this.select()">${esc(code)}</textarea><div class="row" style="justify-content:flex-start"><button class="btn small" id="tshare">Share code</button></div>`;
+  async function host(){
+    role = "host"; box.innerHTML = `<h2>Start a trade</h2><p id="tnote">Making your code\u2026</p>`;
+    try {
+      mkPc(); wire(pc.createDataChannel("trade")); const off = await pc.createOffer(); await pc.setLocalDescription(off); await gatherIce(pc);
+      const code = await encodeDesc(pc.localDescription);
+      box.innerHTML = `<h2>Start a trade</h2><p><b>1.</b> Send this code to your friend.</p>${codeBlock(code)}<p style="margin-top:12px"><b>2.</b> When they send a reply code back, paste it here.</p><textarea id="treply" class="codebox" rows="3" placeholder="Paste their reply code" spellcheck="false" autocapitalize="off"></textarea><div class="row" style="justify-content:flex-start"><button class="btn" id="tconn">Connect</button><button class="btn ghost small" id="tback">Back</button></div><p id="tnote"></p>`;
+      $("#tshare", m).onclick = () => shareCode("Wildmoor trade code:\n" + code);
+      $("#tback", m).onclick = () => { try { pc.close(); } catch {} intro(); };
+      $("#tconn", m).onclick = async () => { try { note("Connecting\u2026"); await pc.setRemoteDescription(await decodeDesc($("#treply", m).value)); } catch (e) { note(e.message || "That reply code didn\u2019t work.", true); } };
+    } catch { note("Couldn\u2019t make a code here. Your browser may not support trading.", true); }
+  }
+  function guest(){
+    role = "guest"; box.innerHTML = `<h2>Join a trade</h2><p><b>1.</b> Paste the code your friend sent you.</p><textarea id="tin" class="codebox" rows="4" placeholder="Paste their code" spellcheck="false" autocapitalize="off"></textarea><div class="row" style="justify-content:flex-start"><button class="btn" id="tmake">Make my reply</button><button class="btn ghost small" id="tback">Back</button></div><p id="tnote"></p>`;
+    $("#tback", m).onclick = () => { try { pc && pc.close(); } catch {} intro(); };
+    $("#tmake", m).onclick = async () => {
+      try {
+        note("Making your reply\u2026"); const off = await decodeDesc($("#tin", m).value); if (off.type !== "offer") throw new Error("That is a reply code. Paste the first code your friend made.");
+        mkPc(); pc.ondatachannel = e => wire(e.channel); await pc.setRemoteDescription(off); const ans = await pc.createAnswer(); await pc.setLocalDescription(ans); await gatherIce(pc);
+        const code = await encodeDesc(pc.localDescription);
+        box.innerHTML = `<h2>Join a trade</h2><p><b>2.</b> Send this reply code back to your friend. Then wait. It connects by itself.</p>${codeBlock(code)}<p id="tnote">Waiting for your friend\u2026</p>`;
+        $("#tshare", m).onclick = () => shareCode("Wildmoor trade reply:\n" + code);
+      } catch (e) { note(e.message || "That code didn\u2019t work.", true); }
+    };
+  }
+  function board(){
+    if (executed) return;
+    const gv = fmtTotals(sumItems(myList().map(x => ({card:x.card, q:x.q})))), tv = fmtTotals(sumItems(theirs.map(p => ({card:tmpCard(p).card, q:p.q}))));
+    const status = lockMine && lockTheirs ? "Finishing\u2026" : lockMine ? "You locked in. Waiting for your friend." : lockTheirs ? "Your friend locked in. Check the cards, then lock in." : "Pick your cards, then lock in. Both of you must lock in on the same trade.";
+    box.innerHTML = `<h2>Trade</h2>
+      <h3 class="sect">You give${gv ? ", worth " + esc(gv) : ""}</h3><div class="tlist" id="tmine">${myList().length ? myList().map((x, i) => trow(x.set, x.card, x.q, true, i)).join("") : `<p class="tlog">Nothing yet.</p>`}</div>
+      <div class="row" style="justify-content:flex-start"><button class="btn ghost small" id="tadd"${lockMine ? " disabled" : ""}>Add cards</button></div>
+      <h3 class="sect">You get${tv ? ", worth " + esc(tv) : ""}</h3><div class="tlist" id="tget">${theirs.length ? theirs.map(p => { const t = tmpCard(p); return trow(t.set, t.card, p.q, false, 0); }).join("") : `<p class="tlog">Your friend hasn\u2019t added anything yet.</p>`}</div>
+      <p id="tnote" class="tstat">${status}</p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" id="tlock"${!myList().length && !theirs.length ? " disabled" : ""}>${lockMine ? "Unlock" : "Lock in"}</button><button class="btn ghost" id="tleave">Leave</button></div>`;
+    $("#tleave", m).onclick = close; $("#tadd", m).onclick = picker;
+    $("#tlock", m).onclick = () => { if (lockMine){ lockMine = false; send({k:"unlock"}); board(); } else { lockMine = true; send({k:"lock", sig:sigOf()}); board(); maybeRun(); } };
+    box.querySelectorAll("#tmine [data-rm]").forEach(b => b.onclick = () => { const it = myList()[+b.dataset.rm]; if (!it) return; it.q--; if (it.q <= 0) mine.delete(tkey(sidOf(it.set), it.card.id)); pushOffer(); board(); });
+  }
+  function picker(){
+    const list = tradables();
+    box.innerHTML = `<h2>Your spare cards</h2><p>Tap a card to add one copy to the trade.</p>${list.length ? `<div class="grid">${list.slice(0, 120).map((x, i) => `<button class="slotbtn" data-i="${i}" aria-label="${esc(x.card.name)}, ${x.q} spare">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}<span class="qty">\u00d7${x.q}</span></button>`).join("")}</div>` : `<p class="tlog">You have no duplicate cards yet. Open more packs!</p>`}<div class="row" style="margin-top:14px"><button class="btn" id="pdone">Done</button></div>`;
+    box.querySelectorAll(".grid .slotbtn").forEach(b => b.onclick = () => {
+      const x = list[+b.dataset.i], k = tkey(sidOf(x.set), x.card.id), cur = mine.get(k) || {set:x.set, card:x.card, q:0};
+      if (cur.q >= x.q){ toast("That\u2019s all your spares of this card."); return; } cur.q++; mine.set(k, cur); pushOffer(); toast(`${x.card.name}: ${cur.q} in the trade.`);
+    });
+    $("#pdone", m).onclick = board;
+  }
+  function done(res){
+    box.innerHTML = `<h2>Trade complete</h2><p>You gave ${esc(res.gave.join(", ") || "nothing")}.</p><p>You got ${esc(res.got.join(", ") || "nothing")}.</p><div class="row" style="justify-content:flex-start"><button class="btn" id="tfin">Done</button></div>`;
+    $("#tfin", m).onclick = close; buzz([30, 40, 60]); try { send({k:"done"}); } catch {}
+  }
+  intro();
+}
+
+/* ---------- Scan cards you own ---------- */
+const lev = (a, b) => { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let prev = Array.from({length:n + 1}, (_, j) => j);
+  for (let i = 1; i <= m; i++){ const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[n]; };
+const nsim = (a, b) => (!a || !b) ? 0 : a === b ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
+const numOfId = id => { const m = String(id).match(/-([^-]+)$/); return m ? m[1].replace(/^0+(?=\d)/, "").toLowerCase() : ""; };
+function buildIndex(){ const out = []; for (const set of sets){ if (set.builtIn) continue; for (const card of set.cards) out.push({set, card, nn:nrm(card.name), num:numOfId(card.id)}); } return out; }
+function findCards(info, limit = 6){
+  const nn = nrm(info.name || ""), idx = buildIndex(), pool = info.num ? idx.filter(e => e.num === info.num) : idx, res = [];
+  for (const e of pool){
+    let sc = nn ? nsim(nn, e.nn) * (info.num ? .55 : 1) : 0; if (!nn && !info.num) continue;
+    if (info.num) sc += .3;
+    if (info.total){ const pr = e.set.printed || 0; if (pr ? pr === info.total : (info.total <= e.set.cards.length && info.total >= e.set.cards.length - 90)) sc += .15; else if (pr) sc -= .12; }
+    res.push({e, sc});
+  }
+  res.sort((a, b) => b.sc - a.sc);
+  const min = info.num ? (nn ? .5 : .45) : .72;
+  return res.filter(r => r.sc >= min - 1e-6).slice(0, limit).map(r => r.e);
+}
+function searchText(q){
+  const nm = q.match(/(\d{1,3})\s*(?:\/\s*(\d{1,3}))?/), text = nrm(q.replace(/[0-9\/]/g, " ")), num = nm ? nm[1].replace(/^0+(?=\d)/, "") : "", total = nm && nm[2] ? parseInt(nm[2], 10) : 0;
+  if (!text && !num) return [];
+  const out = []; for (const e of buildIndex()){
+    if (text && !e.nn.includes(text)) continue; if (num && e.num !== num) continue;
+    if (total && e.set.printed && e.set.printed !== total) continue;
+    out.push(e); if (out.length >= 400) break;
+  }
+  const rel = e => String(e.set.released || "");
+  out.sort((a, b) => (a.nn.startsWith(text) ? 0 : 1) - (b.nn.startsWith(text) ? 0 : 1) || rel(b).localeCompare(rel(a)));
+  return out.slice(0, 12);
+}
+function parseCardText(top, bot, full){
+  const all = [bot, top, full].join("\n"), m = all.match(/\b([A-Za-z]{0,3}\d{1,3})\s*\/\s*([A-Za-z]{0,3}\d{1,3})\b/);
+  const num = m ? m[1].replace(/^[A-Za-z]+/, "").replace(/^0+(?=\d)/, "").toLowerCase() || m[1].toLowerCase() : "", total = m ? parseInt(m[2].replace(/\D/g, ""), 10) || 0 : 0;
+  const noise = new Set(["basic", "pokemon", "trainer", "item", "supporter", "stadium", "energy", "tool", "hp", "stage"]);
+  let name = ""; for (const raw of String(top || full).split(/\n/)){
+    let x = raw.replace(/[^A-Za-z\u00c0-\u00ff'\u2019\-.\s\u2640\u2642]/g, " ").replace(/\bHP\b.*$/i, "").replace(/^\s*(basic|stage\s*[12]|restored)\b/i, "").replace(/\s+/g, " ").trim();
+    if (x.replace(/[^A-Za-z]/g, "").length >= 3 && !noise.has(x.toLowerCase()) && !/^evolves/i.test(x)){ name = x; break; }
+  }
+  return {name, num, total};
+}
+let ocrWorker = null, ocrLoading = null;
+const loadScript = src => new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = () => rej(new Error("load")); document.head.appendChild(el); });
+function getOcr(say){
+  if (ocrWorker) return Promise.resolve(ocrWorker);
+  if (!ocrLoading) ocrLoading = (async () => {
+    say("Loading the text reader (one time, about 4 MB)\u2026");
+    if (!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+    ocrWorker = await window.Tesseract.createWorker("eng"); return ocrWorker;
+  })().catch(e => { ocrLoading = null; throw e; });
+  return ocrLoading;
+}
+function cropCanvas(src, x, y, w, h, scale){
+  const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(w * scale)); c.height = Math.max(1, Math.round(h * scale));
+  const g = c.getContext("2d"); try { g.filter = "grayscale(1) contrast(1.5)"; } catch {} g.drawImage(src, x, y, w, h, 0, 0, c.width, c.height); return c;
+}
+async function readCard(src, say){
+  const wk = await getOcr(say), W = src.width, H = src.height, sc = Math.min(2.5, 1400 / W); say("Reading the card\u2026");
+  const top = (await wk.recognize(cropCanvas(src, 0, 0, W * .8, H * .2, sc))).data.text, bot = (await wk.recognize(cropCanvas(src, 0, H * .86, W, H * .14, sc))).data.text;
+  let info = parseCardText(top, bot, "");
+  if (!info.num && !info.name){ const full = (await wk.recognize(cropCanvas(src, 0, 0, W, H, Math.min(1.5, 1400 / W)))).data.text; info = parseCardText(top, bot, full); }
+  return info;
+}
+function addPhysical(set, card){ const k = ownKey(set, card); state.owned[k] = (state.owned[k] || 0) + 1; state.phys = state.phys || {}; state.phys[k] = (state.phys[k] || 0) + 1; persist(); checkAch(); }
+function removePhysical(set, card){
+  const k = ownKey(set, card); if (!(state.phys && state.phys[k] > 0)) return;
+  state.phys[k]--; if (!state.phys[k]) delete state.phys[k]; state.owned[k] = (state.owned[k] || 1) - 1; if (state.owned[k] <= 0) delete state.owned[k]; persist();
+}
+const pbadge = (set, c) => (state.phys && state.phys[ownKey(set, c)]) ? '<span class="hand">In hand</span>' : "";
+function openScanner(){
+  const m = document.createElement("div"); m.className = "modal scanner"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", "Scan cards you own");
+  m.innerHTML = `<div class="scanbox" id="scanbox"><video id="scanvid" playsinline muted></video><div class="scanframe"></div></div>
+    <p id="scanmsg" class="scanmsg">Fit the card inside the frame, then tap Scan.</p>
+    <div class="row"><button class="btn" id="scansnap">Scan</button><label class="btn ghost small filebtn">Use a photo<input type="file" id="scanfile" accept="image/*" class="sr"></label><button class="btn ghost small" id="scanclose">Done</button></div>
+    <input type="text" id="scanq" class="scanq" placeholder="Or search by name or number, like 58/102" autocapitalize="off" spellcheck="false" aria-label="Search your imported sets">
+    <div id="scanres" class="scanres" aria-live="polite"></div>`;
+  document.body.appendChild(m);
+  const msg = $("#scanmsg", m), res = $("#scanres", m), vid = $("#scanvid", m), snapBtn = $("#scansnap", m); let stream = null, cur = [];
+  const say = t => { msg.textContent = t; };
+  const row = (e, i) => { const n = (state.phys && state.phys[ownKey(e.set, e.card)]) || 0;
+    return `<div class="srow"><div class="sthumb">${cardHTML(e.set, e.card, "100%")}</div><div class="sinfo"><b>${esc(e.card.name)}</b><span>${esc(e.set.name)}, #${esc(numOfId(e.card.id))}${e.set.printed ? "/" + e.set.printed : ""}</span><small>${n ? "In hand: " + n : "Not in hand yet"}</small></div><div class="sact"><button class="btn small" data-add="${i}">Add</button>${n ? `<button class="btn ghost small" data-rm="${i}" aria-label="Remove one">\u22121</button>` : ""}</div></div>`; };
+  const show = (list, note) => {
+    cur = list; res.innerHTML = list.length ? list.map(row).join("") : (note ? `<p class="scanmsg">${esc(note)}</p>` : "");
+    res.querySelectorAll("[data-add]").forEach(b => b.onclick = () => { const e = cur[+b.dataset.add]; addPhysical(e.set, e.card); toast(`Added ${e.card.name}. In hand: ${state.phys[ownKey(e.set, e.card)]}.`); show(cur, note); });
+    res.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { const e = cur[+b.dataset.rm]; removePhysical(e.set, e.card); show(cur, note); });
+  };
+  const scanCanvas = async c => {
+    snapBtn.disabled = true;
+    try { const info = await readCard(c, say), found = findCards(info);
+      say(found.length ? "Is it one of these? Tap Add for the right one." : `I read ${info.name ? "\u201c" + info.name + "\u201d" : "nothing clear"}${info.num ? ", number " + info.num : ""}, but found no match. Try again, or search below.`);
+      show(found, found.length ? "" : "No match yet.");
+    } catch { say("Couldn\u2019t load the text reader. Check your connection, or search by name below."); }
+    finally { snapBtn.disabled = false; }
+  };
+  const stopCam = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+  const onKey = e => { if (e.key === "Escape") close(); };
+  const close = () => { stopCam(); m.remove(); document.removeEventListener("keydown", onKey); if (tab === "binder") renderBinder(); };
+  document.addEventListener("keydown", onKey);
+  $("#scanclose", m).onclick = close;
+  snapBtn.onclick = async () => {
+    if (!stream || !vid.videoWidth) return; const vw = vid.videoWidth, vh = vid.videoHeight, w = vw * .82, h = vh * .86, c = document.createElement("canvas");
+    c.width = Math.round(w); c.height = Math.round(h); c.getContext("2d").drawImage(vid, vw * .09, vh * .07, w, h, 0, 0, c.width, c.height); await scanCanvas(c);
+  };
+  $("#scanfile", m).onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+    try { const bmp = await createImageBitmap(f), k = Math.min(1, 1800 / bmp.width), c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height); await scanCanvas(c); }
+    catch { say("Couldn\u2019t open that photo."); }
+  };
+  let t = 0; $("#scanq", m).addEventListener("input", e => { clearTimeout(t); t = setTimeout(() => { const q = e.target.value.trim(); if (!q){ show([], ""); return; } const f = searchText(q); say(f.length ? "Tap Add for the right one." : "Nothing found. Check the spelling, or import that set in the Library."); show(f, ""); }, 220); });
+  (async () => {
+    try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}, width:{ideal:1920}, height:{ideal:1440}}, audio:false}); vid.srcObject = stream; await vid.play(); }
+    catch { $("#scanbox", m).hidden = true; snapBtn.hidden = true; say("The camera isn\u2019t available here. Use a photo, or search below."); }
+  })();
+}
+
 /* ---------- Backup, install and share ---------- */
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; const b = $("#pwainstall"); if (b) b.hidden = false; });
 window.addEventListener("appinstalled", () => { installEvt = null; const b = $("#pwainstall"); if (b) b.hidden = true; });
+const BUILD = 27;
 const isHosted = () => /^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname);
+async function latestBuild(){ const r = await fetch("sw.js?" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/wildmoor-v(\d+)/); return m ? +m[1] : 0; }
+async function applyUpdate(latest){
+  try { const keys = await caches.keys(); await Promise.all(keys.filter(k => k.startsWith("wildmoor-")).map(k => caches.delete(k))); const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); } catch {}
+  location.replace(location.pathname + "?v=" + latest);
+}
+function showUpdateBar(latest){
+  if ($(".updbar")) return; const el = document.createElement("div"); el.className = "updbar"; el.setAttribute("role", "status");
+  el.innerHTML = `<span>A new version is ready.</span><button class="btn small" id="updgo">Update</button><button class="btn ghost small" id="updx" aria-label="Dismiss">Later</button>`; document.body.appendChild(el);
+  $("#updgo", el).onclick = () => { el.querySelector("span").textContent = "Updating\u2026"; applyUpdate(latest); }; $("#updx", el).onclick = () => el.remove();
+}
+async function checkUpdate(){
+  if (!isHosted()) return toast("Updates come through the hosted link.");
+  try { const l = await latestBuild(); if (l > BUILD) showUpdateBar(l); else toast(`You have the newest version (${BUILD}).`); } catch { toast("Couldn\u2019t check. Are you online?"); }
+}
 async function saveFile(name, text, type){
   try { const dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; if (dl){ await dl.save({filename:name, data:new Blob([text], {type})}); return; } } catch {}
   const url = URL.createObjectURL(new Blob([text], {type})), a = document.createElement("a");
@@ -1670,7 +2110,7 @@ async function importZip(){
         if (c.price != null){ o.price = c.price; o.cur = c.cur; }
         if (c.thumb && !(c.image && c.image.replace(/_hires(\.\w+)$/, "$1") === c.thumb)) o.thumb = c.thumb; return o; });
       total += cards.length;
-      out.push({id:"z-" + (slug(rel) || "set" + i), name: String(md.name || stem), series: md.series ? String(md.series) : "Imported", released: md.releaseDate ? String(md.releaseDate) : "", scan, cards});
+      out.push({id:"z-" + (slug(rel) || "set" + i), name: String(md.name || stem), series: md.series ? String(md.series) : "Imported", released: md.releaseDate ? String(md.releaseDate) : "", printed: Number(md.printedTotal) || 0, scan, cards});
     }
     if (!out.length) throw new Error("No card lists were found in that zip.");
     say(`Saving ${out.length} sets (${total} cards)\u2026`); await tick();
@@ -1832,7 +2272,8 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
     <p class="hint" style="text-align:left;margin:10px 0 0">On iPhone, tap the Share icon in Safari, then Add to Home Screen.</p>
   </section>
   <p class="hint" style="margin:6px 0 0;text-align:left">Fan-made and unofficial. Pokémon and its card images belong to their owners. This app bundles none of them. It loads images and prices from public sources you choose.</p>
-  <p class="hint" style="margin:6px 0 0">Version 24 · iPhone tweaks</p>`;
+  <p class="hint" style="margin:6px 0 0">Version ${BUILD} · updates</p>
+  ${isHosted() ? `<div class="row" style="margin-top:6px"><button class="btn ghost small" id="chkupd">Check for updates</button></div>` : ""}`;
   $("#ijsonfile").onchange = async e => { const f = e.target.files[0]; if (f){ $("#ijson").value = await f.text(); } };
   $("#ido").onclick = doImport;
   $("#zipfile").onchange = pickZip; $("#zgo").onclick = importZip;
@@ -1851,7 +2292,7 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
   });
   const dall = $("#delall"); if (dall) dall.onclick = async () => {
     if (!confirm(`Delete all ${custom.length} imported sets and their cards from your binder?`)) return;
-    for (const x of custom){ try { await store.deleteSet(x.id); } catch {} for (const k of Object.keys(state.owned)) if (k.startsWith(x.id + ":")) delete state.owned[k]; }
+    for (const x of custom){ try { await store.deleteSet(x.id); } catch {} forgetSet(x.id); }
     sets = [WILDMOOR]; state.active = "wildmoor"; session = null; queued = null; persist(); render(); toast("Imported sets deleted.");
   };
   $("#ifetch").onclick = fetchApi;
@@ -1859,6 +2300,7 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
   if (pulled){ $("#ifetchbox").open = true; $("#fstatus").textContent = `${pulled.length} cards are loaded and ready to import. Name the set, then tap Import set.`; if (pulledName && !$("#iname").value) $("#iname").value = pulledName; }
   $("#ggen").onclick = generateBack;
   const mp = $("#motionperm"); if (mp) mp.onclick = async () => { try { const r = await DeviceOrientationEvent.requestPermission(); toast(r === "granted" ? "Motion tilt on." : "Motion tilt was not allowed."); } catch { toast("Couldn\u2019t turn on motion tilt."); } };
+  const cu = $("#chkupd"); if (cu) cu.onclick = checkUpdate;
   $("#bkgo").onclick = makeBackup; $("#bkfile").onchange = restoreBackup;
   const pi = $("#pwainstall"); pi.hidden = !installEvt; pi.onclick = async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; pi.hidden = true; };
   $("#shareapp").onclick = () => shareText("Try Wildmoor Packs, a card pack opening app.");
@@ -1895,7 +2337,7 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
     const s = sets.find(x => x.id === b.dataset.del); if (!s || !confirm(`Delete “${s.name}” and its cards from your binder?`)) return;
     try { await store.deleteSet(s.id); } catch (e) { toast("Couldn’t delete that set."); return; }
     sets = sets.filter(x => x.id !== s.id);
-    for (const k of Object.keys(state.owned)) if (k.startsWith(s.id + ":")) delete state.owned[k];
+    forgetSet(s.id);
     if (state.active === s.id) state.active = "wildmoor";
     persist(); render(); toast("Set deleted.");
   });
@@ -1949,7 +2391,7 @@ async function doImport(){
   store = await initStore();
   try { const s = await store.load(); if (s) state = Object.assign(DEFAULT_STATE(), s); } catch (e) { console.warn(e); }
   try { const extra = await store.listSets(); sets = [WILDMOOR, ...extra.filter(s => s && Array.isArray(s.cards))]; } catch (e) { console.warn(e); }
-  document.body.classList.toggle("nofoil", !!state.noFoil); applyLite();
+  document.body.classList.toggle("nofoil", !!state.noFoil); applyLite(); checkAch(true);
   if (isHosted()){
     const l = document.createElement("link"); l.rel = "manifest"; l.href = "manifest.webmanifest"; document.head.appendChild(l);
     const ic = document.createElement("link"); ic.rel = "apple-touch-icon"; ic.href = "icon-192.png"; document.head.appendChild(ic);
@@ -1959,6 +2401,7 @@ async function doImport(){
       navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) toast("Updated. Close and reopen the app for the newest version."); });
     }
   }
+  if (isHosted()) setTimeout(async () => { try { const l = await latestBuild(); if (l > BUILD) showUpdateBar(l); } catch {} }, 2500);
   render();
 })();
 })();

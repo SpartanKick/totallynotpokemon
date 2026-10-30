@@ -45,6 +45,15 @@ For your friends
   card sets they import their own data in the Library tab.
 - Prices and card images load from public websites, so they need a connection.
 
+Trading between friends
+-----------------------
+In the Binder tab, "Trade with a friend" lets two people swap duplicate cards
+directly between their phones. They connect by sending each other short codes
+(for example over WhatsApp). No account and no server of yours is needed.
+The phones use free public STUN helper servers (Google, Cloudflare) only to find
+each other. Cards never pass through them. If two phones on mobile data cannot
+connect, try both on the same Wi-Fi. Trades run on trust, so only trade with friends.
+
 A note on card images and names
 -------------------------------
 This app contains no Pokemon artwork, names or card data. Pokemon and its
