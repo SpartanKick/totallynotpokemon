@@ -493,6 +493,22 @@ body.lite .pack{filter:drop-shadow(0 14px 14px rgba(8,4,18,.45))}
 .cardwrap{--cw:min(72vw,290px)}
 .cardwrap .ghost{position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:63/88;border-radius:4.5% / 3.2%;overflow:hidden;z-index:0;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.4);transform:translate(-50%,calc(-50% + var(--n) * 19px)) scale(calc(1 - var(--n) * .06));opacity:calc(1 - var(--n) * .18)}
 .cardwrap .ghost .card{--w:100%;width:100%}
+.foil{filter:hue-rotate(var(--ph,0deg))}
+.searchbox{margin:0 0 10px}
+.searchbox input{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit}
+.vchart{width:100%;height:auto;display:block}
+.vrange{display:flex;justify-content:space-between;gap:8px;font-size:.78rem;color:var(--muted);margin-top:6px}
+.bestpull{display:flex;gap:14px;align-items:center}
+.bestpull .slotbtn{width:110px;flex:none}
+.sbars{display:flex;flex-direction:column;gap:8px}
+.sbar{display:grid;grid-template-columns:96px 1fr 38px;align-items:center;gap:10px;font-size:.85rem}
+.sbar>div{height:10px;border-radius:6px;background:var(--line);overflow:hidden}
+.sbar>div i{display:block;height:100%;background:var(--heather);border-radius:6px}
+.sbar b{text-align:right}
+.tut{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,4,18,.72)}
+.tutbox{max-width:340px;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center}
+.tutbox h2{margin:4px 0 8px}
+.tutstep{font-size:.78rem;color:var(--muted);margin:0}
 .cardwrap .ghost.g1{--n:1}.cardwrap .ghost.g2{--n:2}
 .cardwrap .ghost img,.cardwrap .ghost svg{width:100%;height:100%;display:block;object-fit:cover}
 /* random pack + trading */
@@ -558,7 +574,24 @@ function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let 
 function shade(hex, amt){ const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = n >> 8 & 255, b = n & 255;
   const f = v => Math.max(0, Math.min(255, Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt)));
   return "#" + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, "0")).join(""); }
-const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch {} };
+const buzz = p => { if (state.haptics === false) return; try { navigator.vibrate && navigator.vibrate(p); } catch {} };
+/* small synthesized sound effects, no audio files needed */
+let actx = null;
+function sfx(kind){
+  if (!kind || state.sound === false) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
+    const t0 = actx.currentTime, out = actx.createGain(); out.gain.value = .16; out.connect(actx.destination);
+    const tone = (f, s, d, type = "sine", g = 1) => { const o = actx.createOscillator(), e = actx.createGain(); o.type = type; o.frequency.value = f; e.gain.setValueAtTime(0, t0 + s); e.gain.linearRampToValueAtTime(g, t0 + s + .012); e.gain.exponentialRampToValueAtTime(.001, t0 + s + d); o.connect(e); e.connect(out); o.start(t0 + s); o.stop(t0 + s + d + .05); };
+    const hiss = d => { const n = Math.floor(actx.sampleRate * d), b = actx.createBuffer(1, n, actx.sampleRate), a = b.getChannelData(0); for (let i = 0; i < n; i++) a[i] = (Math.random() * 2 - 1) * (1 - i / n); const src = actx.createBufferSource(), f = actx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 1800; src.buffer = b; src.connect(f); f.connect(out); src.start(t0); };
+    if (kind === "tear"){ hiss(.4); tone(180, 0, .25, "triangle", .5); }
+    else if (kind === "flip") tone(620, 0, .09, "triangle", .6);
+    else if (kind === "swipe") hiss(.12);
+    else if (kind === "rare"){ tone(660, 0, .25); tone(880, .1, .35); }
+    else if (kind === "holo"){ [660, 880, 1100].forEach((f, i) => tone(f, i * .09, .4)); }
+    else if (kind === "ultra"){ [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .08, .6)); tone(2093, .35, .7, "sine", .3); }
+  } catch {}
+}
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 let toastT;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3200); }
@@ -1105,7 +1138,7 @@ document.addEventListener("error", e => {
   const im = e.target; if (!(im instanceof HTMLImageElement) || !im.dataset.name) return;
   const d = document.createElement("div"); d.className = "ph"; d.textContent = im.dataset.name; im.replaceWith(d);
 }, true);
-$("#setSel").addEventListener("change", e => { if (tearing){ e.target.value = state.active; return; } state.active = e.target.value; session = null; binderLimit = 60; binderFilter = "all"; persist(); render(); });
+$("#setSel").addEventListener("change", e => { if (tearing){ e.target.value = state.active; return; } state.active = e.target.value; session = null; binderLimit = 60; binderFilter = "all"; binderQuery = ""; binderType = "all"; persist(); render(); });
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
 
 function render(){
@@ -1181,7 +1214,7 @@ function renderOpen(){
   v.innerHTML = `<div class="stage home">
       <div class="packzone" id="packzone">
         <svg class="slashfx fade" id="slash" aria-hidden="true"><path d=""/></svg>
-        ${packMarkup(rnd ? "Mystery pack" : set.name, hero)}
+        ${packMarkup(rnd ? "Mystery pack" : set.name, hero, rnd ? 0 : setHue(set))}
       </div>
       <div class="stats"><span class="stat"><b>${state.packs}</b> ${state.packs === 1 ? "pack" : "packs"} opened</span><span class="stat"><b>${ownedN}/${totalN}</b> collected</span></div>
       <div class="scope packmode" role="group" aria-label="Pack type"><button class="chip" data-pm="set" aria-pressed="${!rnd}">Pick a set</button><button class="chip" data-pm="random" aria-pressed="${rnd}">Random pack</button></div>
@@ -1205,9 +1238,11 @@ function emblemSVG(){
   const petals = Array.from({length:8}, (_, k) => `<ellipse rx="7" ry="22" cy="-27" transform="rotate(${k * 45})"/>`).join("");
   return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="em-g" cx=".5" cy=".4" r=".75"><stop offset="0" stop-color="#5A3992"/><stop offset="1" stop-color="#1D1233"/></radialGradient></defs><rect width="100" height="100" fill="url(#em-g)"/><g transform="translate(50 50)"><circle r="40" fill="none" stroke="#F2C24B" stroke-opacity=".5" stroke-dasharray="2 4"/><g fill="#B79BF0" fill-opacity=".95" stroke="#F2C24B" stroke-opacity=".55" transform="scale(.9)">${petals}</g><circle r="8" fill="#F2C24B"/></g></svg>`;
 }
-function packMarkup(name, hero){
+/* every imported set gets its own foil colour, picked from its id so it stays the same */
+function setHue(set){ if (set.builtIn) return 0; let h = 7; for (const ch of String(set.id)) h = (h * 31 + ch.charCodeAt(0)) % 360; return 40 + h % 280; }
+function packMarkup(name, hero, hue = 0){
   const fx = '<div class="packholo"></div><div class="packglare"></div>';
-  return `<button class="pack" id="pack" aria-label="Tear open a ${esc(name)} pack. Swipe across it, or press Enter." style="--clipTop:${PACK_CLIPS.top};--clipBot:${PACK_CLIPS.bot}">
+  return `<button class="pack" id="pack" aria-label="Tear open a ${esc(name)} pack. Swipe across it, or press Enter." style="--clipTop:${PACK_CLIPS.top};--clipBot:${PACK_CLIPS.bot};--ph:${hue}deg">
     <div class="pack3d">
       <div class="piece bot">
         <div class="foil"></div><div class="rays"></div>
@@ -1270,7 +1305,7 @@ function bindPack(){
   pack.addEventListener("click", e => { if (e.detail === 0 && !pack.dataset.busy && !done){ done = true; tearPack(1); } });
 }
 function tearPack(dir = 1){
-  const set = packSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1"; tearing = true;
+  const set = packSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1"; tearing = true; sfx("tear");
   const cards = (queued && queued.set === set.id) ? queued.cards : makePack(set); queued = null; if (state.packMode === "random") rndPick = null;
   const isNew = cards.map(c => !state.owned[ownKey(set, c)]);
   // de-dupe "new" within the same pack
@@ -1343,6 +1378,7 @@ function particles(card){
 }
 function revealFx(card){
   const r = rankOf(card); const fx = $("#fx");
+  sfx(r >= 4 ? "ultra" : r === 3 ? "holo" : r === 2 ? "rare" : null);
   if (r >= 2 && fx){ fx.className = "fx " + fxClass(card); requestAnimationFrame(() => fx.classList.add("on")); particles(card); }
   if (r >= 3) document.body.classList.add("dim");
   if (r >= 4 && !reduceMotion()){ const f = document.createElement("div"); f.className = "flash"; document.body.appendChild(f); setTimeout(() => f.remove(), 800); }
@@ -1356,7 +1392,7 @@ function advance(dir = -1, up = false){
     const r = rankOf(card), charge = reduceMotion() ? 0 : 420;
     if (charge){ f.classList.add("charge"); buzz(8); }
     setTimeout(() => {
-      f.classList.remove("charge"); f.classList.add("up"); s.flipped = true;
+      f.classList.remove("charge"); f.classList.add("up"); s.flipped = true; sfx("flip");
       $("#flipBtn").setAttribute("aria-label", "Next card");
       setTimeout(() => {
         s.busy = false; if (!f.isConnected) return;
@@ -1368,7 +1404,7 @@ function advance(dir = -1, up = false){
     }, charge);
     return;
   }
-  s.leaving = true;
+  s.leaving = true; sfx("swipe");
   const btn = $("#flipBtn");
   btn.style.transition = "transform .38s ease-in, opacity .38s";
   btn.style.transform = up ? `translateY(-140%)` : `translateX(${(dir || 1) * 140}%)`; btn.style.opacity = "0";
@@ -1400,19 +1436,27 @@ function renderSummary(){
 }
 
 /* ================= Binder ================= */
+let binderQuery = "", binderType = "all";
 let binderScope = "set", allSort = "recent", allFilter = "all", allLimit = 60, packLimit = 10;
 const cardIdx = new WeakMap();
 const cardById = (set, id) => { let m = cardIdx.get(set); if (!m){ m = new Map(set.cards.map(c => [c.id, c])); cardIdx.set(set, m); } return m.get(id); };
 const rankOfCard = c => (RARITY[c.rarity || "common"] || RARITY.common).rank;
-const scopeBar = () => `<div class="scope" role="group" aria-label="Collection view">${[["set","This set"],["all","All cards"],["packs","Packs"],["awards","Awards"]].map(([k, l]) => `<button class="chip" data-scope="${k}" aria-pressed="${binderScope === k}">${l}</button>`).join("")}</div><div class="row" style="justify-content:flex-start;margin:-4px 0 12px;gap:8px"><button class="btn ghost small" id="scanbtn">Scan or add a card you own</button><button class="btn ghost small" id="tradebtn">Trade with a friend</button></div>`;
-function bindScope(v){ v.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { binderScope = b.dataset.scope; renderBinder(); window.scrollTo(0, 0); }); const sb = v.querySelector("#scanbtn"); if (sb) sb.onclick = openScanner; const tb = v.querySelector("#tradebtn"); if (tb) tb.onclick = openTrade; }
-function renderBinder(){ if (binderScope === "all") renderAllCards(); else if (binderScope === "packs") renderPacks(); else if (binderScope === "awards") renderAwards(); else renderSetBinder(); }
+const hayOf = c => [c.name, c.type, (RARITY[c.rarity || "common"] || RARITY.common).label, c.rarity, c.id, c.move, c.hp].filter(Boolean).join(" ").toLowerCase();
+const matchQ = (c, q) => { const w = String(q || "").toLowerCase().split(/\s+/).filter(Boolean); if (!w.length) return true; const h = hayOf(c); return w.every(x => h.includes(x)); };
+const searchBox = () => `<div class="searchbox"><input type="search" id="bq" placeholder="Search name, type or rarity" value="${esc(binderQuery)}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search cards"></div>`;
+function bindSearch(v){
+  const el = v.querySelector("#bq"); if (!el) return; let t;
+  el.oninput = () => { clearTimeout(t); t = setTimeout(() => { binderQuery = el.value; binderLimit = 60; allLimit = 60; renderBinder(); const n = $("#bq"); if (n){ n.focus(); const l = n.value.length; try { n.setSelectionRange(l, l); } catch {} } }, 180); };
+}
+const scopeBar = () => `<div class="scope" role="group" aria-label="Collection view">${[["set","This set"],["all","All cards"],["packs","Packs"],["stats","Stats"],["awards","Awards"]].map(([k, l]) => `<button class="chip" data-scope="${k}" aria-pressed="${binderScope === k}">${l}</button>`).join("")}</div><div class="row" style="justify-content:flex-start;margin:-4px 0 12px;gap:8px"><button class="btn ghost small" id="scanbtn">Scan or add a card you own</button><button class="btn ghost small" id="tradebtn">Trade with a friend</button></div>`;
+function bindScope(v){ bindSearch(v); v.querySelectorAll("[data-scope]").forEach(b => b.onclick = () => { binderScope = b.dataset.scope; renderBinder(); window.scrollTo(0, 0); }); const sb = v.querySelector("#scanbtn"); if (sb) sb.onclick = openScanner; const tb = v.querySelector("#tradebtn"); if (tb) tb.onclick = openTrade; }
+function renderBinder(){ if (binderScope === "all") renderAllCards(); else if (binderScope === "packs") renderPacks(); else if (binderScope === "awards") renderAwards(); else if (binderScope === "stats") renderStats(); else renderSetBinder(); }
 function renderAllCards(){
   const v = $("#view"), rec = new Map(); (state.history || []).forEach((h, idx) => h.c.forEach(id => { const k = h.s + ":" + id; if (!rec.has(k)) rec.set(k, idx); }));
   const all = []; for (const set of sets) for (let i = 0; i < set.cards.length; i++){ const c = set.cards[i], q = state.owned[ownKey(set, c)]; if (q) all.push({set, card:c, q, i}); }
   const copies = all.reduce((n, x) => n + x.q, 0), nsets = new Set(all.map(x => x.set.id)).size, val = fmtTotals(sumItems(all));
   const minR = {all:0, rare:2, holo:3, ultra:4}[allFilter] || 0, rk = x => rec.has(x.set.id + ":" + x.card.id) ? rec.get(x.set.id + ":" + x.card.id) : 1e9;
-  const list = all.filter(x => allFilter === "dupes" ? dupQty(x.set, x.card) > 0 : rankOfCard(x.card) >= minR);
+  const list = all.filter(x => allFilter === "dupes" ? dupQty(x.set, x.card) > 0 : rankOfCard(x.card) >= minR).filter(x => matchQ(x.card, binderQuery));
   list.sort(allSort === "rarity" ? (a, b) => rankOfCard(b.card) - rankOfCard(a.card) || rk(a) - rk(b)
     : allSort === "value" ? (a, b) => (b.card.price || 0) - (a.card.price || 0) || rankOfCard(b.card) - rankOfCard(a.card)
     : allSort === "set" ? (a, b) => a.set.name.localeCompare(b.set.name) || a.i - b.i
@@ -1421,6 +1465,7 @@ function renderAllCards(){
   v.innerHTML = `${scopeBar()}
     <div class="progress" style="grid-template-columns:1fr"><div class="pinfo"><div class="big">${all.length}<small> different cards</small></div>
       <div class="rar">${val ? `<span><b>${esc(val)}</b> total value</span>` : ""}<span>${copies} copies</span><span>${nsets} ${nsets === 1 ? "set" : "sets"}</span><span>${state.packs} ${state.packs === 1 ? "pack" : "packs"} opened</span></div></div></div>
+    ${searchBox()}
     <div class="filters" role="group" aria-label="Sort and filter">${chips([["recent","Newest"],["value","Most valuable"],["rarity","Best first"],["set","By set"]], "sort", allSort)}${chips([["all","Any rarity"],["dupes","Duplicates"],["rare","Rare+"],["holo","Holo+"],["ultra","Ultra"]], "af", allFilter)}</div>
     ${list.length ? `<div class="grid">${list.slice(0, allLimit).map((x, k) => `<button class="slotbtn" data-k="${k}" aria-label="${esc(x.card.name)}, ${esc(x.set.name)}">${cardHTML(x.set, x.card, "100%")}${ptag(x.card)}${pbadge(x.set, x.card)}${x.q > 1 ? `<span class="qty">\u00d7${x.q}</span>` : ""}</button>`).join("")}</div>${list.length > allLimit ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="more">Show more (${list.length - allLimit} left)</button></div>` : ""}`
       : `<div class="empty"><p>${all.length ? "No cards match this filter." : "You don\u2019t own any cards yet. Open a pack to start your collection."}</p></div>`}`;
@@ -1449,7 +1494,9 @@ function renderSetBinder(){
   const pct = set.cards.length ? Math.round(owned.length / set.cards.length * 100) : 0;
   const sv = fmtTotals(sumItems(owned.map(card => ({card, q:state.owned[ownKey(set, card)]}))));
   const present = RANKS.filter(r => set.cards.some(c => (c.rarity || "common") === r));
-  const list = set.cards.map((c, i) => ({c, i})).filter(({c}) => binderFilter === "all" || (binderFilter === "owned" ? state.owned[ownKey(set, c)] : binderFilter === "missing" ? !state.owned[ownKey(set, c)] : binderFilter === "dupes" ? dupQty(set, c) > 0 : (c.rarity || "common") === binderFilter));
+  const types = [...new Set(set.cards.map(c => c.type).filter(t => typeof t === "string" && t))].sort();
+  if (binderType !== "all" && !types.includes(binderType)) binderType = "all";
+  const list = set.cards.map((c, i) => ({c, i})).filter(({c}) => (binderFilter === "all" || (binderFilter === "owned" ? state.owned[ownKey(set, c)] : binderFilter === "missing" ? !state.owned[ownKey(set, c)] : binderFilter === "dupes" ? dupQty(set, c) > 0 : (c.rarity || "common") === binderFilter)) && (binderType === "all" || c.type === binderType) && matchQ(c, binderQuery));
   v.innerHTML = `${scopeBar()}
     <div class="progress">
       <div class="ring" role="img" aria-label="${pct}% of ${esc(set.name)} collected"><svg viewBox="0 0 84 84" width="84" height="84"><circle cx="42" cy="42" r="35" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="42" cy="42" r="35" fill="none" stroke="var(--heather)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(220 * pct / 100).toFixed(1)} 220"/></svg><b>${pct}%</b></div>
@@ -1457,9 +1504,11 @@ function renderSetBinder(){
         <div class="rar">${present.map(r => `<span><i class="dot ${r}"></i>${set.cards.filter(c => (c.rarity || "common") === r && state.owned[ownKey(set, c)]).length}/${set.cards.filter(c => (c.rarity || "common") === r).length}</span>`).join("")}${sv ? `<span><b>${esc(sv)}</b> value</span>` : ""}</div>
       </div>
     </div>
+    ${searchBox()}
     <div class="filters" role="group" aria-label="Filter cards">
       ${[["all","All"],["owned","Owned"],["missing","Missing"],["dupes","Duplicates"], ...present.map(r => [r, RARITY[r].label])].map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${binderFilter === k}">${l}</button>`).join("")}
     </div>
+    ${types.length > 1 && types.length <= 30 ? `<div class="filters" role="group" aria-label="Filter by type">${[["all","Any type"], ...types.map(t => [t, t.charAt(0).toUpperCase() + t.slice(1)])].map(([k, l]) => `<button class="chip" data-t="${esc(k)}" aria-pressed="${binderType === k}">${esc(l)}</button>`).join("")}</div>` : ""}
     ${list.length ? `<div class="grid">${list.slice(0, binderLimit).map(({c, i}) => {
       const q = state.owned[ownKey(set, c)];
       return q ? `<button class="slotbtn" data-i="${i}" aria-label="${esc(c.name)}, ${q} owned">${cardHTML(set, c, "100%")}${ptag(c)}${pbadge(set, c)}${q > 1 ? `<span class="qty">×${q}</span>` : ""}</button>`
@@ -1468,6 +1517,7 @@ function renderSetBinder(){
     <div class="row" style="margin-top:24px"><button class="btn ghost small" id="reset">Reset ${esc(set.name)} collection</button></div>`;
   bindScope(v);
   v.querySelectorAll(".chip[data-f]").forEach(b => b.onclick = () => { binderFilter = b.dataset.f; binderLimit = 60; renderBinder(); });
+  v.querySelectorAll(".chip[data-t]").forEach(b => b.onclick = () => { binderType = b.dataset.t; binderLimit = 60; renderBinder(); });
   const more = $("#more"); if (more) more.onclick = () => { const y = window.scrollY; binderLimit += 60; renderBinder(); window.scrollTo(0, y); };
   v.querySelectorAll(".grid .slotbtn").forEach(b => b.onclick = () => zoom(set, set.cards[+b.dataset.i]));
   $("#reset").onclick = () => {
@@ -1813,6 +1863,70 @@ function renderAwards(){
     ${open.length ? `<h3 class="sect">In progress</h3><div class="awards">${open.map(row).join("")}</div>` : ""}
     ${done.length ? `<h3 class="sect">Unlocked</h3><div class="awards">${done.map(row).join("")}</div>` : ""}`;
   bindScope(v);
+}
+
+/* ---------- Stats ---------- */
+function ownedItems(){
+  const all = []; for (const set of sets) for (let i = 0; i < set.cards.length; i++){ const c = set.cards[i], q = state.owned[ownKey(set, c)]; if (q) all.push({set, card:c, q, i}); }
+  return all;
+}
+/* remembers what the collection is worth, once a day, for the value-over-time line */
+function snapValue(){
+  try {
+    const m = sumItems(ownedItems()), ks = Object.keys(m).filter(k => m[k] > 0); if (ks.length !== 1) return;
+    const day = new Date().toISOString().slice(0, 10), e = {d:day, c:ks[0], v:Math.round(m[ks[0]] * 100) / 100};
+    state.valLog = state.valLog || []; const last = state.valLog[state.valLog.length - 1];
+    if (last && last.d === day){ if (last.v === e.v && last.c === e.c) return; state.valLog[state.valLog.length - 1] = e; } else state.valLog.push(e);
+    if (state.valLog.length > 400) state.valLog.shift(); persist();
+  } catch {}
+}
+function renderStats(){
+  snapValue();
+  const v = $("#view"), all = ownedItems(), copies = all.reduce((n, x) => n + x.q, 0), val = fmtTotals(sumItems(all));
+  const rk = x => x.card.rarity || "common";
+  const byRank = RANKS.map(r => ({r, n:all.filter(x => rk(x) === r).reduce((n, x) => n + x.q, 0), u:all.filter(x => rk(x) === r).length})), maxN = Math.max(1, ...byRank.map(x => x.n));
+  let best = null;
+  for (const h of (state.history || [])){
+    const set = sets.find(x => x.id === h.s); if (!set) continue;
+    for (const id of h.c){ const c = cardById(set, id); if (!c) continue; const sc = (c.price != null ? (toUSD(c.price, c.cur) || 0) : 0) * 1000 + rankOfCard(c); if (!best || sc > best.sc) best = {set, c, sc}; }
+  }
+  const log = state.valLog || [], cur = log.length ? log[log.length - 1].c : null, pts = log.filter(p => p.c === cur);
+  let chart = `<p class="hint" style="text-align:left;margin:0">Your collection’s value is saved once a day. Add prices in the Library tab, then come back tomorrow to see the line.</p>`;
+  if (pts.length >= 2){
+    const W = 300, H = 90, vs = pts.map(p => p.v), lo = Math.min(...vs), hi = Math.max(...vs), span = hi - lo || 1;
+    const xy = pts.map((p, i) => (i / (pts.length - 1) * W).toFixed(1) + "," + (H - 6 - (p.v - lo) / span * (H - 12)).toFixed(1)).join(" ");
+    chart = `<svg viewBox="0 0 ${W} ${H}" class="vchart" role="img" aria-label="Collection value over time"><polyline fill="none" stroke="var(--heather)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${xy}"/></svg><div class="vrange"><span>${esc(pts[0].d)}: ${esc(money(pts[0].v, cur))}</span><span>${esc(pts[pts.length - 1].d)}: ${esc(money(pts[pts.length - 1].v, cur))}</span></div>`;
+  }
+  v.innerHTML = `${scopeBar()}
+    <div class="progress" style="grid-template-columns:1fr"><div class="pinfo"><div class="big">${all.length}<small> different cards</small></div>
+      <div class="rar">${val ? `<span><b>${esc(val)}</b> value</span>` : ""}<span>${copies} copies</span><span>${state.packs} ${state.packs === 1 ? "pack" : "packs"} opened</span><span>${(state.stats && state.stats.pulled) || 0} cards pulled</span></div></div></div>
+    <section class="panel"><h2>Value over time</h2>${chart}</section>
+    <section class="panel"><h2>Best pull</h2>${best ? `<div class="bestpull"><button class="slotbtn" id="bestcard" aria-label="${esc(best.c.name)}">${cardHTML(best.set, best.c, "100%")}</button><div><b>${esc(best.c.name)}</b><br><small style="color:var(--muted)">${esc(best.set.name)} · ${esc(RARITY[best.c.rarity || "common"].label)}</small>${best.c.price != null ? `<br><b>${esc(money(best.c.price, best.c.cur))}</b>` : ""}</div></div>` : `<p class="hint" style="text-align:left;margin:0">Open a pack to see your best pull.</p>`}</section>
+    <section class="panel"><h2>Rarity breakdown</h2><div class="sbars">${byRank.map(x => `<div class="sbar"><span><i class="dot ${x.r}"></i>${esc(RARITY[x.r].label)}</span><div><i style="width:${Math.round(x.n / maxN * 100)}%"></i></div><b>${x.n}</b></div>`).join("")}</div><p class="hint" style="text-align:left;margin:8px 0 0">Copies you own of each rarity.</p></section>`;
+  bindScope(v);
+  const bc = $("#bestcard"); if (bc) bc.onclick = () => zoom(best.set, best.c);
+}
+
+/* ---------- First-run tutorial ---------- */
+const TUT = [
+  {t:"Tear open a pack", d:"Swipe across the pack to tear it. Pick a set, or open a random pack for a surprise."},
+  {t:"Swipe through your cards", d:"Swipe each card away to see the next one, like a real pack. Rares glow, and holo cards shimmer when you tilt them."},
+  {t:"Fill your binder", d:"The Binder tab shows what you own and what is missing. Search by name, type or rarity, and filter by owned or missing."},
+  {t:"Bring in more sets", d:"The Library tab imports card sets from JSON, images or a zip, and looks up card prices."},
+  {t:"Trade with friends", d:"In the Binder tab, tap Trade with a friend to swap spare cards with someone else."}
+];
+function showTutorial(){
+  if ($(".tut")) return; let i = 0;
+  const el = document.createElement("div"); el.className = "tut"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "How it works");
+  const done = () => { el.remove(); state.tutDone = true; persist(); };
+  const draw = () => {
+    const s = TUT[i];
+    el.innerHTML = `<div class="tutbox"><p class="tutstep">${i + 1} of ${TUT.length}</p><h2>${esc(s.t)}</h2><p>${esc(s.d)}</p><div class="row"><button class="btn ghost small" id="tskip">Skip</button><button class="btn" id="tnext">${i === TUT.length - 1 ? "Got it" : "Next"}</button></div></div>`;
+    el.querySelector("#tskip").onclick = done;
+    el.querySelector("#tnext").onclick = () => { if (i === TUT.length - 1) done(); else { i++; draw(); } };
+    el.querySelector("#tnext").focus();
+  };
+  document.body.appendChild(el); draw();
 }
 
 /* ---------- QR code ---------- */
@@ -2216,7 +2330,7 @@ function openScanner(){
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; const b = $("#pwainstall"); if (b) b.hidden = false; });
 window.addEventListener("appinstalled", () => { installEvt = null; const b = $("#pwainstall"); if (b) b.hidden = true; });
-const BUILD = 32;
+const BUILD = 33;
 const isHosted = () => /^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname);
 async function latestBuild(){ const r = await fetch("sw.js?" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/wildmoor-v(\d+)/); return m ? +m[1] : 0; }
 async function applyUpdate(latest){
@@ -2225,7 +2339,7 @@ async function applyUpdate(latest){
 }
 function showUpdateBar(latest){
   if ($(".updbar")) return; const el = document.createElement("div"); el.className = "updbar"; el.setAttribute("role", "status");
-  el.innerHTML = `<span>A new version is ready.</span><button class="btn small" id="updgo">Update</button><button class="btn ghost small" id="updx" aria-label="Dismiss">Later</button>`; document.body.appendChild(el);
+  el.innerHTML = `<span>New version ready.</span><button class="btn small" id="updgo">Tap to reload</button><button class="btn ghost small" id="updx" aria-label="Dismiss">Later</button>`; document.body.appendChild(el);
   $("#updgo", el).onclick = () => { el.querySelector("span").textContent = "Updating\u2026"; applyUpdate(latest); }; $("#updx", el).onclick = () => el.remove();
 }
 async function checkUpdate(){
@@ -2332,7 +2446,7 @@ async function importZip(){
     say(`Saving ${out.length} sets (${total} cards)\u2026`); await tick();
     await store.saveMany(out);
     const ids = new Set(out.map(x => x.id)); sets = [WILDMOOR, ...sets.filter(x => !x.builtIn && !ids.has(x.id)), ...out];
-    const newest = out.slice().sort((p, q) => String(q.released).localeCompare(String(p.released)))[0]; state.active = newest.id; session = null; queued = null; binderLimit = 60; binderFilter = "all"; persist();
+    const newest = out.slice().sort((p, q) => String(q.released).localeCompare(String(p.released)))[0]; state.active = newest.id; session = null; queued = null; binderLimit = 60; binderFilter = "all"; binderQuery = ""; binderType = "all"; persist();
     zipHandle = null; toast(`Imported ${out.length} sets, ${total} cards.`); render();
     const z2 = $("#zstatus"); if (z2) z2.textContent = `Imported ${out.length} sets with ${total} cards. Pick any set from the menu at the top.`;
   } catch (err) { say(err.message || "Import failed.", true); go.disabled = false; }
@@ -2464,6 +2578,18 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
     </div>
   </section>
   <section class="panel">
+    <h2>Sound and vibration</h2>
+    <p>Sound effects when you tear a pack, flip a card and pull a rare. Vibration works on phones that support it.</p>
+    <div class="filters" style="position:static;margin:0 0 8px;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none" role="group" aria-label="Sound effects">
+      <button class="chip" data-snd="on" aria-pressed="${state.sound !== false}">Sound on</button>
+      <button class="chip" data-snd="off" aria-pressed="${state.sound === false}">Sound off</button>
+    </div>
+    <div class="filters" style="position:static;margin:0;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none" role="group" aria-label="Vibration">
+      <button class="chip" data-hap="on" aria-pressed="${state.haptics !== false}">Vibration on</button>
+      <button class="chip" data-hap="off" aria-pressed="${state.haptics === false}">Vibration off</button>
+    </div>
+  </section>
+  <section class="panel">
     <h2>Card back</h2>
     <p>The design shown on every card before you flip it.</p>
     <div class="backrow">
@@ -2506,7 +2632,8 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
     <p class="hint" style="text-align:left;margin:10px 0 0">On iPhone, tap the Share icon in Safari, then Add to Home Screen.</p>
   </section>
   <p class="hint" style="margin:6px 0 0;text-align:left">Fan-made and unofficial. Pokémon and its card images belong to their owners. This app bundles none of them. It loads images and prices from public sources you choose.</p>
-  <p class="hint" style="margin:6px 0 0">Version ${BUILD} · trade fix</p>
+  <p class="hint" style="margin:6px 0 0">Version ${BUILD}</p>
+  <div class="row" style="margin-top:6px"><button class="btn ghost small" id="tutbtn">Show the tutorial</button></div>
   ${isHosted() ? `<div class="row" style="margin-top:6px"><button class="btn ghost small" id="chkupd">Check for updates</button></div>` : ""}`;
   $("#ijsonfile").onchange = async e => { const f = e.target.files[0]; if (f){ $("#ijson").value = await f.text(); } };
   $("#ido").onclick = doImport;
@@ -2567,6 +2694,17 @@ X-Team-ID: your-team"></textarea><small style="color:var(--muted)">Headers aren�
     v.querySelectorAll("[data-foil]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
     toast(state.noFoil ? "Foil shimmer off." : "Foil shimmer on.");
   });
+  v.querySelectorAll("[data-snd]").forEach(b => b.onclick = () => {
+    state.sound = b.dataset.snd === "on"; persist();
+    v.querySelectorAll("[data-snd]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    if (state.sound) sfx("rare"); toast(state.sound ? "Sound on." : "Sound off.");
+  });
+  v.querySelectorAll("[data-hap]").forEach(b => b.onclick = () => {
+    state.haptics = b.dataset.hap === "on"; persist();
+    v.querySelectorAll("[data-hap]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    if (state.haptics) buzz(40); toast(state.haptics ? "Vibration on." : "Vibration off.");
+  });
+  const tb = $("#tutbtn"); if (tb) tb.onclick = () => showTutorial();
   v.querySelectorAll("[data-rs]").forEach(b => b.onclick = () => {
     state.faceDown = b.dataset.rs === "down"; persist(); session = null;
     v.querySelectorAll("[data-rs]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
@@ -2623,7 +2761,7 @@ async function doImport(){
     say(`Saving ${cards.length} cards…`);
     await new Promise(r => setTimeout(r, 40));
     await store.saveSet(set);
-    pulled = null; pulledName = ""; binderLimit = 60; binderFilter = "all";
+    pulled = null; pulledName = ""; binderLimit = 60; binderFilter = "all"; binderQuery = ""; binderType = "all";
     sets.push(set); state.active = set.id; session = null; persist();
     const noImg = cards.filter(c => !c.image).length;
     toast(`Imported ${cards.length} cards into “${set.name}”.`);
@@ -2646,12 +2784,19 @@ async function doImport(){
     if ("serviceWorker" in navigator){
       const had = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.register("sw.js").catch(() => {});
-      navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) toast("Updated. Close and reopen the app for the newest version."); });
+      navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) latestBuild().then(showUpdateBar).catch(() => showUpdateBar(BUILD + 1)); });
     }
+    let lastChk = Date.now();
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible" || Date.now() - lastChk < 6e5) return; lastChk = Date.now();
+      latestBuild().then(l => { if (l > BUILD) showUpdateBar(l); }).catch(() => {});
+    });
   }
   if (state.curShow && (!state.rates || Date.now() - state.rates.t > 864e5)) setTimeout(() => { refreshRates().then(() => render()).catch(() => {}); }, 3000);
   if (isHosted()) setTimeout(async () => { try { const l = await latestBuild(); if (l > BUILD) showUpdateBar(l); } catch {} }, 2500);
+  snapValue();
   render();
+  if (!state.tutDone && !state.packs) setTimeout(() => showTutorial(), 700);
 })();
 })();
 </script>
