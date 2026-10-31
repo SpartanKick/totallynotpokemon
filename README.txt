@@ -12,8 +12,11 @@ Each person's collection is saved on their OWN device. Nothing is uploaded,
 and there is no account. Use Library > Backup and restore to move a
 collection to another phone.
 
-What's in Version 33
+What's in Version 34
 --------------------
+New in Version 34
+- Fixed: a small flicker, like a reload, when swiping from one card to the next.
+
 New in Version 33
 - Binder search: search by name, type, rarity or number, and filter by
   type as well as owned, missing, duplicates and rarity. Also works in

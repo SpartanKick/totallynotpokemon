@@ -1333,7 +1333,7 @@ function renderReveal(){
     <div class="dots lift" aria-hidden="true">${s.cards.map((c, i) => `<i class="${i < s.idx ? "done" : i === s.idx ? "cur" : ""}"></i>`).join("")}</div>
     <div class="cardwrap" id="cardwrap">
       <div class="fx" id="fx" aria-hidden="true"></div>
-      ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true">${cardHTML(set, s.cards[s.idx + n], "100%")}</div>`).join("")}
+      ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true">${cardHTML(set, s.cards[s.idx + n], "100%", true)}</div>`).join("")}
       <button class="stagebtn${s.idx === 0 ? " deal" : ""}" id="flipBtn" aria-label="${s.flipped ? "Next card" : "Flip card"}">
         <div class="flipper ${s.flipped ? "shown" : ""}" id="flipper">${cardHTML(set, card, w, true)}</div>
         ${s.flipped && s.isNew[s.idx] ? '<span class="badge">New</span>' : ""}
@@ -1342,6 +1342,8 @@ function renderReveal(){
     <p class="raritynote lift" id="rnote">${s.flipped ? noteText(s) : "&nbsp;"}</p>
     <div class="row lift"><button class="btn ghost small" id="skip">Reveal all</button></div>
   </div>`;
+  /* images already in memory show at once instead of fading in again, which looked like a reload */
+  v.querySelectorAll("img[data-name]").forEach(im => { if (im.complete && im.naturalWidth) im.classList.add("ok"); });
   const cEl = $("#flipper .card"); const back = document.createElement("div"); back.className = "back"; back.innerHTML = backInner(set); cEl.appendChild(back);
   if (s.flipped && s.fxFor !== s.idx){ const at = s.idx; s.fxFor = at; setTimeout(() => { if (session === s && s.idx === at && $("#flipper")) revealFx(card); }, reduceMotion() ? 0 : 480); }
   if (s.flipped && rankOf(card) >= 3) attachTilt($("#flipper"));
@@ -2330,7 +2332,7 @@ function openScanner(){
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; const b = $("#pwainstall"); if (b) b.hidden = false; });
 window.addEventListener("appinstalled", () => { installEvt = null; const b = $("#pwainstall"); if (b) b.hidden = true; });
-const BUILD = 33;
+const BUILD = 34;
 const isHosted = () => /^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname);
 async function latestBuild(){ const r = await fetch("sw.js?" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/wildmoor-v(\d+)/); return m ? +m[1] : 0; }
 async function applyUpdate(latest){
