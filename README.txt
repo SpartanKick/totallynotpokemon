@@ -37,6 +37,23 @@ Updating later
 Upload the new files over the old ones. Friends get the new version the next
 time they open the app (the app tells them to close and reopen it).
 
+Development workflow (branches)
+-------------------------------
+This project lives at https://github.com/SpartanKick/totallynotpokemon
+and is hosted with GitHub Pages from the "main" branch.
+
+- main = released versions only. Whatever is on main is live for friends.
+- dev  = where new features are built and tested.
+
+For each change:
+  1. Work and commit on the dev branch. Test it (open index.html locally).
+  2. When a version is fully working, bump the version:
+       - VERSION.txt (for example "Version 32")
+       - the CACHE name in sw.js (for example "wildmoor-v32"), so installed
+         copies refresh. The two must always match.
+  3. Merge dev into main to release. GitHub Pages then updates the live site.
+  4. Carry on working on dev for the next version.
+
 For your friends
 ----------------
 - Android (Chrome): open the link, then menu > Install app (or Add to Home screen).
