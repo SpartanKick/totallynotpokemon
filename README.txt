@@ -12,8 +12,20 @@ Each person's collection is saved on their OWN device. Nothing is uploaded,
 and there is no account. Use Library > Backup and restore to move a
 collection to another phone.
 
-What's in Version 32
+What's in Version 33
 --------------------
+New in Version 33
+- Binder search: search by name, type, rarity or number, and filter by
+  type as well as owned, missing, duplicates and rarity. Also works in
+  All cards.
+- Stats tab in the Binder: value over time (saved once a day), best pull and
+  a rarity breakdown.
+- Update banner: when a new version is out you get "New version ready, tap to
+  reload". It also checks when you come back to the app.
+- Each imported set gets its own pack colour.
+- Sound effects and vibration, each with an on/off switch in the Library tab.
+- A short first-run tutorial (Library > Show the tutorial to see it again).
+
 New in Version 32
 - Swiping through a pack: cards stay flat and front-facing, and slide off the
   top of a face-up stack like a real pack, with the next cards showing behind it.
@@ -73,8 +85,8 @@ C) Cloudflare Pages
 
 Updating later
 --------------
-Upload the new files over the old ones. Friends get the new version the next
-time they open the app (the app tells them to close and reopen it).
+Upload the new files over the old ones. Friends see a "New version ready, tap
+to reload" banner the next time they open the app or come back to it.
 
 For your friends
 ----------------

@@ -1,6 +1,6 @@
 /* Wildmoor Packs service worker: keeps the app working offline.
    Only files from this site are cached. Card images, prices and fonts always come from the network. */
-const CACHE = "wildmoor-v32";
+const CACHE = "wildmoor-v33";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {
