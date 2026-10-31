@@ -12,6 +12,36 @@ Each person's collection is saved on their OWN device. Nothing is uploaded,
 and there is no account. Use Library > Backup and restore to move a
 collection to another phone.
 
+What's in Version 31
+--------------------
+Open tab
+- Tear open foil packs and flip the cards one at a time.
+- Rarity tiers (common, uncommon, rare, holo, ultra) with glowing rare slots
+  and a foil/holo shimmer that follows the tilt of the card.
+Binder tab
+- Tracks the cards you own, duplicates, empty slots in each set, and how
+  complete each set is. Tap a card for a detailed view.
+- Trade with a friend: two people swap spare cards live. Each side picks
+  what to give, and both must lock in. If either offer changes, the locks
+  reset. The card picker stays open while the other person's updates arrive.
+Library tab
+- Wildmoor, the built-in original set (32 creatures across 8 element types).
+- Import a set from JSON and/or image files (images are matched to cards by
+  file name), or import a whole card database from a zip.
+- Pull cards from an API: set the URL, optional headers (such as X-Api-Key),
+  follow multiple pages, and map fields with dot paths (such as data,
+  images.large, rarity) if the names differ.
+- Card prices (TCGdex, Pokemon TCG API or a custom source), price version
+  (Standard, 1st Edition, Highest), and currency conversion.
+- Settings for opening style, card image quality, foil shimmer, card back and
+  performance. Backup and restore of your whole collection.
+
+Hosting limits: the hosted (web) version cannot call most other websites'
+APIs or show images linked from other sites, because of browser (CORS)
+rules. Two ways around it:
+  1. Open wildmoor.html on a computer for direct API fetching.
+  2. Upload the .json file and the image files in the Library tab.
+
 Pick ONE of these ways to put it online (all free)
 ---------------------------------------------------
 A) Netlify Drop (fastest, about 2 minutes)
