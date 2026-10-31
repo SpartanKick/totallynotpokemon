@@ -492,6 +492,7 @@ body.lite .pack{filter:drop-shadow(0 14px 14px rgba(8,4,18,.45))}
 /* cards stacked behind the one you swipe */
 .cardwrap{--cw:min(72vw,290px)}
 .cardwrap .ghost{position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:63/88;border-radius:4.5% / 3.2%;overflow:hidden;z-index:0;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.4);transform:translate(-50%,calc(-50% + var(--n) * 19px)) scale(calc(1 - var(--n) * .06));opacity:calc(1 - var(--n) * .18)}
+.cardwrap .ghost{background:linear-gradient(#f1ecde,#cfc8b4);border:1px solid rgba(0,0,0,.25)}
 .cardwrap .ghost.g1{--n:1}.cardwrap .ghost.g2{--n:2}
 .cardwrap .ghost img,.cardwrap .ghost svg{width:100%;height:100%;display:block;object-fit:cover}
 /* random pack + trading */
@@ -766,7 +767,7 @@ function priceFromRaw(c, rarity){
   }
   const cm = (c.cardmarket && c.cardmarket.prices) || (c.pricing && c.pricing.cardmarket) || (c.prices && c.prices.cardmarket);
   if (cm && typeof cm === "object"){
-    if (holo){ const h = cm["trend-holo"] ?? cm["avg-holo"] ?? cm.trendHolo; if (typeof h === "number" && h > 0) return {price:h, cur:cm.unit || "EUR"}; }
+    /* Cardmarket's "-holo" fields are the REVERSE holo version, so a holo card uses the normal trend like any other card */
     const v = pickMarket(cm); if (v != null) return {price:v, cur:cm.unit || "EUR"};
   }
   return null;
@@ -1080,6 +1081,7 @@ async function initStore(){
 /* ================= App state ================= */
 let store, state = DEFAULT_STATE(), sets = [WILDMOOR], tab = "open";
 let session = null; // current pack opening
+let tearing = false; // true while a torn pack is animating open
 let binderFilter = "all", binderLimit = 60;
 let pulled = null, pulledName = "";
 const activeSet = () => sets.find(s => s.id === state.active) || WILDMOOR;
@@ -1103,7 +1105,7 @@ document.addEventListener("error", e => {
   const im = e.target; if (!(im instanceof HTMLImageElement) || !im.dataset.name) return;
   const d = document.createElement("div"); d.className = "ph"; d.textContent = im.dataset.name; im.replaceWith(d);
 }, true);
-$("#setSel").addEventListener("change", e => { state.active = e.target.value; session = null; binderLimit = 60; binderFilter = "all"; persist(); render(); });
+$("#setSel").addEventListener("change", e => { if (tearing){ e.target.value = state.active; return; } state.active = e.target.value; session = null; binderLimit = 60; binderFilter = "all"; persist(); render(); });
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
 
 function render(){
@@ -1186,7 +1188,7 @@ function renderOpen(){
       <p class="hint" id="packhint">Swipe across the pack to tear it open${rnd ? ". The set is a surprise." : ""}</p>
     </div>`;
   bindPack(); queuePack(set);
-  v.querySelectorAll("[data-pm]").forEach(b => b.onclick = () => { state.packMode = b.dataset.pm; rndPick = null; queued = null; session = null; persist(); renderOpen(); });
+  v.querySelectorAll("[data-pm]").forEach(b => b.onclick = () => { if (tearing || session) return; state.packMode = b.dataset.pm; rndPick = null; queued = null; session = null; persist(); renderOpen(); });
 }
 const PACK_CLIPS = (() => {
   const jit = [0, .9, -.4, .7, -.6, .5, -.3, .8, -.5, .6, -.7, .4, -.2, .9, -.6, .3, 0];
@@ -1268,7 +1270,7 @@ function bindPack(){
   pack.addEventListener("click", e => { if (e.detail === 0 && !pack.dataset.busy && !done){ done = true; tearPack(1); } });
 }
 function tearPack(dir = 1){
-  const set = packSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1";
+  const set = packSet(); const pack = $("#pack"); if (pack.dataset.busy) return; pack.dataset.busy = "1"; tearing = true;
   const cards = (queued && queued.set === set.id) ? queued.cards : makePack(set); queued = null; if (state.packMode === "random") rndPick = null;
   const isNew = cards.map(c => !state.owned[ownKey(set, c)]);
   // de-dupe "new" within the same pack
@@ -1279,10 +1281,10 @@ function tearPack(dir = 1){
   state.history = state.history || []; state.history.unshift({t:Date.now(), s:set.id, c:cards.map(c => c.id)}); if (state.history.length > 400) state.history.length = 400;
   persist(); setTimeout(() => checkAch(), 1600);
   session = {set:set.id, cards, isNew, idx:0, flipped:!state.faceDown};
-  if (reduceMotion()){ renderOpen(); return; }
+  if (reduceMotion()){ tearing = false; renderOpen(); return; }
   pack.style.setProperty("--dir", dir); pack.style.setProperty("--tear", "1"); pack.style.setProperty("--origin", dir > 0 ? "0%" : "100%");
   pack.classList.remove("dragging", "nudge"); pack.classList.add("torn"); buzz([20, 30, 40]);
-  setTimeout(renderOpen, 1050);
+  setTimeout(() => { tearing = false; if (tab === "open") renderOpen(); }, 1050);
 }
 function rarityGlow(card){ const r = RARITY[card.rarity]?.rank ?? 0; return r >= 3 ? "glow-holo" : r === 2 ? "glow-rare" : ""; }
 const rankOf = card => RARITY[card.rarity]?.rank ?? 0;
@@ -1296,7 +1298,7 @@ function renderReveal(){
     <div class="dots lift" aria-hidden="true">${s.cards.map((c, i) => `<i class="${i < s.idx ? "done" : i === s.idx ? "cur" : ""}"></i>`).join("")}</div>
     <div class="cardwrap" id="cardwrap">
       <div class="fx" id="fx" aria-hidden="true"></div>
-      ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true">${backInner(set)}</div>`).join("")}
+      ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true"></div>`).join("")}
       <button class="stagebtn deal" id="flipBtn" aria-label="${s.flipped ? "Next card" : "Flip card"}">
         <div class="flipper ${s.flipped ? "shown" : ""}" id="flipper">${cardHTML(set, card, w, true)}</div>
         ${s.flipped && s.isNew[s.idx] ? '<span class="badge">New</span>' : ""}
@@ -1315,7 +1317,7 @@ function renderReveal(){
   btn.addEventListener("pointerdown", e => { if (s.leaving || s.busy) return; sx = e.clientX; sy = e.clientY; dx = dy = 0; swiped = false; btn.style.transition = "none"; try { btn.setPointerCapture(e.pointerId); } catch {} });
   btn.addEventListener("pointermove", e => {
     if (sx == null) return; dx = e.clientX - sx; dy = e.clientY - sy;
-    if (Math.hypot(dx, dy) > 6) btn.style.transform = `translate(${dx * (s.flipped ? 1 : .55)}px,${dy * (s.flipped ? 1 : .55)}px) rotate(${dx / (s.flipped ? 18 : 30)}deg)`;
+    if (Math.hypot(dx, dy) > 6) btn.style.transform = `translate(${dx * (s.flipped ? 1 : .55)}px,${dy * (s.flipped ? 1 : .55)}px)`;
   });
   const end = () => {
     if (sx == null) return; sx = null;
@@ -1369,7 +1371,7 @@ function advance(dir = -1, up = false){
   s.leaving = true;
   const btn = $("#flipBtn");
   btn.style.transition = "transform .38s ease-in, opacity .38s";
-  btn.style.transform = up ? `translateY(-140%) rotate(${dir * 8}deg)` : `translateX(${(dir || 1) * 140}%) translateY(-30px) rotate(${(dir || 1) * 18}deg)`; btn.style.opacity = "0";
+  btn.style.transform = up ? `translateY(-140%)` : `translateX(${(dir || 1) * 140}%)`; btn.style.opacity = "0";
   $("#fx")?.classList.remove("on"); document.body.classList.remove("dim");
   setTimeout(() => { s.leaving = false; s.idx++; s.flipped = !state.faceDown; renderOpen(); }, reduceMotion() ? 0 : 340);
 }
@@ -2208,7 +2210,7 @@ function openScanner(){
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; const b = $("#pwainstall"); if (b) b.hidden = false; });
 window.addEventListener("appinstalled", () => { installEvt = null; const b = $("#pwainstall"); if (b) b.hidden = true; });
-const BUILD = 31;
+const BUILD = 32;
 const isHosted = () => /^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname);
 async function latestBuild(){ const r = await fetch("sw.js?" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/wildmoor-v(\d+)/); return m ? +m[1] : 0; }
 async function applyUpdate(latest){
