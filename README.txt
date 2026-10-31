@@ -12,8 +12,17 @@ Each person's collection is saved on their OWN device. Nothing is uploaded,
 and there is no account. Use Library > Backup and restore to move a
 collection to another phone.
 
-What's in Version 31
+What's in Version 32
 --------------------
+New in Version 32
+- Swiping through a pack: cards stay flat and front-facing, and slide off the
+  top of a plain face-up stack like a real pack.
+- Fixed: tapping "Pick a set" (or changing set) right after tearing a pack
+  counted the pack but never showed the cards.
+- Fixed: prices for holo cards from Cardmarket used the reverse-holo price,
+  which made many holo cards look too cheap. Run Library > Card prices >
+  Update to refresh prices you already saved.
+
 Open tab
 - Tear open foil packs and flip the cards one at a time.
 - Rarity tiers (common, uncommon, rare, holo, ultra) with glowing rare slots

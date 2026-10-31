@@ -1,2 +1,2 @@
-Version 31
-Check: sw.js line 3 must say wildmoor-v31
+Version 32
+Check: sw.js line 3 must say wildmoor-v32
