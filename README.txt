@@ -16,7 +16,7 @@ What's in Version 32
 --------------------
 New in Version 32
 - Swiping through a pack: cards stay flat and front-facing, and slide off the
-  top of a plain face-up stack like a real pack.
+  top of a face-up stack like a real pack, with the next cards showing behind it.
 - Fixed: tapping "Pick a set" (or changing set) right after tearing a pack
   counted the pack but never showed the cards.
 - Fixed: prices for holo cards from Cardmarket used the reverse-holo price,
