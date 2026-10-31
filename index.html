@@ -1299,7 +1299,7 @@ function renderReveal(){
     <div class="cardwrap" id="cardwrap">
       <div class="fx" id="fx" aria-hidden="true"></div>
       ${[2, 1].filter(n => n <= s.cards.length - s.idx - 1).map(n => `<div class="ghost g${n}" aria-hidden="true">${cardHTML(set, s.cards[s.idx + n], "100%")}</div>`).join("")}
-      <button class="stagebtn deal" id="flipBtn" aria-label="${s.flipped ? "Next card" : "Flip card"}">
+      <button class="stagebtn${s.idx === 0 ? " deal" : ""}" id="flipBtn" aria-label="${s.flipped ? "Next card" : "Flip card"}">
         <div class="flipper ${s.flipped ? "shown" : ""}" id="flipper">${cardHTML(set, card, w, true)}</div>
         ${s.flipped && s.isNew[s.idx] ? '<span class="badge">New</span>' : ""}
       </button>
@@ -1373,6 +1373,12 @@ function advance(dir = -1, up = false){
   btn.style.transition = "transform .38s ease-in, opacity .38s";
   btn.style.transform = up ? `translateY(-140%)` : `translateX(${(dir || 1) * 140}%)`; btn.style.opacity = "0";
   $("#fx")?.classList.remove("on"); document.body.classList.remove("dim");
+  /* the cards behind slide up into place, so the next card is already where it will land */
+  document.querySelectorAll(".cardwrap .ghost").forEach(g => {
+    const n = g.classList.contains("g1") ? 0 : 1;
+    g.style.transition = "transform .34s ease-out, opacity .34s";
+    g.style.transform = `translate(-50%,calc(-50% + ${n * 19}px)) scale(${1 - n * .06})`; g.style.opacity = String(1 - n * .18);
+  });
   setTimeout(() => { s.leaving = false; s.idx++; s.flipped = !state.faceDown; renderOpen(); }, reduceMotion() ? 0 : 340);
 }
 function renderSummary(){
